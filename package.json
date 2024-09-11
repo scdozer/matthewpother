@@ -1,35 +1,44 @@
 {
-  "name": "nextjs-starter-prismic-minimal",
+  "name": "poth",
   "version": "0.1.0",
   "private": true,
-  "license": "Apache-2.0",
-  "author": "Prismic <contact@prismic.io> (https://prismic.io)",
   "scripts": {
-    "dev": "concurrently \"npm:next:dev\" \"npm:slicemachine\" --names \"next,slicemachine\" --prefix-colors blue,magenta",
-    "next:dev": "next dev",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "slicemachine": "start-slicemachine",
-    "format": "prettier --write ."
+    "generate": "graphql-codegen",
+    "deploy-schema": "sanity graphql deploy",
+    "update-schema-and-generate": "npm run deploy-schema && npm run generate",
+    "watch:schema": "nodemon --watch schema --exec npm run update-schema-and-generate"
   },
   "dependencies": {
-    "@prismicio/client": "^7.7.4",
-    "@prismicio/next": "^1.6.0",
-    "@prismicio/react": "^2.8.0",
-    "next": "^14.2.4",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "@react-three/drei": "^9.112.0",
+    "@react-three/fiber": "^8.17.6",
+    "graphql": "^16.9.0",
+    "gsap": "^3.12.5",
+    "next": "14.2.8",
+    "next-sanity": "^9.4.7",
+    "react": "^18",
+    "react-dom": "^18",
+    "sanity": "^3.57.1",
+    "three": "^0.168.0"
   },
   "devDependencies": {
-    "@slicemachine/adapter-next": "^0.3.43",
-    "@types/node": "^20.14.2",
-    "@types/react": "^18.3.3",
-    "@types/react-dom": "^18.3.0",
-    "concurrently": "^8.2.2",
-    "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.4",
-    "slice-machine-ui": "^2.3.0",
-    "typescript": "^5.4.5"
+    "@graphql-codegen/cli": "^5.0.2",
+    "@graphql-codegen/introspection": "^4.0.3",
+    "@graphql-codegen/near-operation-file-preset": "^3.0.0",
+    "@graphql-codegen/typescript": "^4.0.9",
+    "@graphql-codegen/typescript-graphql-request": "^6.2.0",
+    "@graphql-codegen/typescript-operations": "^4.2.3",
+    "@parcel/watcher": "^2.4.1",
+    "@types/graphql": "^14.5.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.8",
+    "nodemon": "^3.1.4",
+    "typescript": "^5"
   }
 }

@@ -1,0 +1,24 @@
+overwrite: true
+schema:
+  - "https://bxcwz78t.api.sanity.io/v2023-08-01/graphql/production/default" # Your Sanity schema
+generates:
+  ./sanity/utils/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-graphql-request"
+    config:
+      fetcher: "graphql-request"
+      useTypeImports: true
+  ./sanity/utils/queries.graphql:
+    plugins:
+      - "./sanity/utils/query-generator.js" # Your custom plugin
+  ./sanity/utils/introspection.json:
+    plugins:
+      - "introspection"
+
+documents: ./schema/**/*.{graphql,gql,js,ts} # Watch all files in the /schema directory
+
+watch:
+  include:
+    - ./schema/**/* # Watch all files in the /schema directory
