@@ -1,4 +1,4 @@
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import Link from "next/link";
 import { PortableText } from "@portabletext/react";
 import { fetchLayout, fetchProjects } from "../sanity/utils/queries";
@@ -9,17 +9,11 @@ async function getHomePageData() {
   return { layout, projects };
 }
 
-export async function generateMetadata(
-  parent: ResolvingMetadata
-): Promise<Metadata> {
-  const { layout } = await getHomePageData();
-
-  return {
-    title: layout.title,
-    description:
-      "Mathew Pothier is a Los Angeles based cinematographer and director of photography, specializing in commercial, narrative, and documentary work.",
-  };
-}
+export const metadata: Metadata = {
+  title: "Mathew Pothier - Cinematographer",
+  description:
+    "Mathew Pothier is a Los Angeles based cinematographer and director of photography, specializing in commercial, narrative, and documentary work.",
+};
 
 export default async function HomePage() {
   const { layout, projects } = await getHomePageData();
@@ -36,7 +30,9 @@ export default async function HomePage() {
             {project.image?.asset?.url && (
               <img src={project.image.asset.url} alt={project.title} />
             )}
-            <Link href={`/projects/${project.slug.current}`}>View Project</Link>
+            <Link href={`/projects/${project?.slug?.current}`}>
+              View Project
+            </Link>
           </div>
         ))}
       </div>
