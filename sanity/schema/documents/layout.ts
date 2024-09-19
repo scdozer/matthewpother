@@ -18,9 +18,16 @@ export const layout = defineType({
       validation: (Rule) => Rule.required().error("Field is required."),
     }),
     defineField({
+      name: "image",
+      title: "Image",
+      type: "image",
+      options: { hotspot: true },
+      validation: (Rule) => Rule.required().error("Field is required."),
+    }),
+    defineField({
       name: "email",
       title: "Email",
-      type: "text",
+      type: "string",
       validation: (Rule) => Rule.required().error("Field is required."),
     }),
     defineField({
