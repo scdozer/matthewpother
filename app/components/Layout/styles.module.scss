@@ -16,8 +16,14 @@
   display: grid;
   grid-template-columns: 5fr 1fr;
   padding: 1rem;
+  h1,
+  div {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
   h1 {
     font-size: 1.2rem;
+    font-weight: 300;
   }
   p {
     font-size: 0.8rem;

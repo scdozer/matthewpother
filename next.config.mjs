@@ -9,7 +9,9 @@ const nextConfig = {
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
-  // other Next.js config options...
+  images: {
+    remotePatterns: [{ hostname: "cdn.sanity.io" }],
+  },
 };
 
 export default nextConfig;

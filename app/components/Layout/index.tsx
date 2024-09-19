@@ -13,11 +13,13 @@ import styles from "./styles.module.scss";
 export default function Layout({ layout }: { layout: SanityLayout }) {
   const [showAbout, setShowAbout] = useState(false);
   const aboutRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descriptionRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (showAbout) {
       gsap.to(aboutRef.current, {
-        display: "block",
+        display: "flex",
         duration: 0.5,
         top: "0",
         ease: "power2.out",
@@ -33,13 +35,34 @@ export default function Layout({ layout }: { layout: SanityLayout }) {
     }
   }, [showAbout]);
 
+  useEffect(() => {
+    gsap.to(titleRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      delay: 0.25,
+      ease: "power2.out",
+    });
+    gsap.to(descriptionRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      delay: 0.25,
+      ease: "power2.out",
+    });
+  }, []);
+
   return (
     <div className={styles.layout}>
       <div className={styles.content}>
-        <h1>
+        <h1 ref={titleRef}>
           <Link href="/">{layout.title}</Link>
         </h1>
-        <div onClick={() => setShowAbout(true)} style={{ cursor: "pointer" }}>
+        <div
+          ref={descriptionRef}
+          onClick={() => setShowAbout(true)}
+          style={{ cursor: "pointer" }}
+        >
           <PortableText value={layout.descriptionRaw} />
         </div>
       </div>
@@ -48,6 +71,7 @@ export default function Layout({ layout }: { layout: SanityLayout }) {
         ref={aboutRef}
         layout={layout}
         onClose={() => setShowAbout(false)}
+        showAbout={showAbout}
       />
     </div>
   );

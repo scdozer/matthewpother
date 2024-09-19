@@ -24,6 +24,17 @@ export const getLayout = gql`
       extraInfoRaw
       instagram
       phone
+      image {
+        asset {
+          url
+          metadata {
+            dimensions {
+              width
+              height
+            }
+          }
+        }
+      }
     }
   }
 `;
@@ -40,6 +51,12 @@ export const getProjects = gql`
       image {
         asset {
           url
+          metadata {
+            dimensions {
+              width
+              height
+            }
+          }
         }
       }
       type
@@ -59,11 +76,23 @@ export const getSingleProject = gql`
       gallery {
         asset {
           url
+          metadata {
+            dimensions {
+              width
+              height
+            }
+          }
         }
       }
       image {
         asset {
           url
+          metadata {
+            dimensions {
+              width
+              height
+            }
+          }
         }
       }
       type

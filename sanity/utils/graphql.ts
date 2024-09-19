@@ -263,6 +263,7 @@ export type Layout = Document & {
   descriptionRaw?: Maybe<Scalars['JSON']['output']>;
   email?: Maybe<Scalars['String']['output']>;
   extraInfoRaw?: Maybe<Scalars['JSON']['output']>;
+  image?: Maybe<Image>;
   instagram?: Maybe<Scalars['String']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
@@ -279,6 +280,7 @@ export type LayoutFilter = {
   _updatedAt?: InputMaybe<DatetimeFilter>;
   address?: InputMaybe<StringFilter>;
   email?: InputMaybe<StringFilter>;
+  image?: InputMaybe<ImageFilter>;
   instagram?: InputMaybe<StringFilter>;
   phone?: InputMaybe<StringFilter>;
   title?: InputMaybe<StringFilter>;
@@ -293,6 +295,7 @@ export type LayoutSorting = {
   _updatedAt?: InputMaybe<SortOrder>;
   address?: InputMaybe<SortOrder>;
   email?: InputMaybe<SortOrder>;
+  image?: InputMaybe<ImageSorting>;
   instagram?: InputMaybe<SortOrder>;
   phone?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;

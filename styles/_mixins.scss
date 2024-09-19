@@ -1,0 +1,48 @@
+$breakpoints: (
+  xs: 0,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px,
+);
+
+// Mixin for min-width media query
+@mixin respond-to($breakpoint) {
+  $size: map-get($breakpoints, $breakpoint);
+
+  @if $size != null {
+    @media (min-width: $size) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint '#{ $breakpoint }' not found in \$breakpoints map.";
+  }
+}
+
+// Mixin for max-width media query
+@mixin respond-to-max($breakpoint) {
+  $size: map-get($breakpoints, $breakpoint);
+
+  @if $size != null {
+    @media (max-width: $size) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint '#{ $breakpoint }' not found in \$breakpoints map.";
+  }
+}
+
+// Mixin for between two breakpoints
+@mixin respond-between($lower, $upper) {
+  $lower-size: map-get($breakpoints, $lower);
+  $upper-size: map-get($breakpoints, $upper);
+
+  @if $lower-size != null and $upper-size != null {
+    @media (min-width: $lower-size) and (max-width: $upper-size) {
+      @content;
+    }
+  } @else {
+    @warn "One of the breakpoints ('#{ $lower }' or '#{ $upper }') not found in \$breakpoints map.";
+  }
+}
