@@ -22,12 +22,13 @@ export default function Layout({ layout }: { layout: SanityLayout }) {
         display: "flex",
         duration: 0.5,
         top: "0",
-        ease: "power2.out",
+        ease: "power2.inOut",
       });
     } else {
       gsap.to(aboutRef.current, {
         top: "100%",
         duration: 0.5,
+        ease: "power2.in",
         onComplete: () => {
           gsap.set(aboutRef.current, { display: "none" });
         },

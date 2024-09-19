@@ -17,21 +17,15 @@ const About = forwardRef<HTMLDivElement, AboutProps>(
 
     const imageRef = useRef<HTMLDivElement>(null);
     const textRefs = useRef<HTMLDivElement[]>([]);
+    const closeRef = useRef<HTMLButtonElement>(null);
 
     useEffect(() => {
       if (!showAbout) return;
       tlRef.current = gsap.timeline({
         paused: true,
-        defaults: { ease: "power2.out" },
+        defaults: { ease: "power2.out", delay: 0.25 },
         onReverseComplete: onClose,
       });
-
-      tlRef.current.fromTo(
-        imageRef.current,
-        { clipPath: "inset(100% 0% 0% 0%)" },
-        { clipPath: "inset(0% 0% 0% 0%)", duration: 1.3, ease: "power2.inOut" },
-        0
-      );
 
       textRefs.current.forEach((el, index) => {
         tlRef.current!.fromTo(
@@ -46,6 +40,20 @@ const About = forwardRef<HTMLDivElement, AboutProps>(
           0.2 + index * 0.1
         );
       });
+
+      tlRef.current.fromTo(
+        imageRef.current,
+        { clipPath: "inset(100% 0% 0% 0%)" },
+        { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power2.out" },
+        0.25
+      );
+
+      tlRef.current.fromTo(
+        closeRef.current,
+        { opacity: 0 },
+        { opacity: 1, duration: 0.25, ease: "power2.out" },
+        0
+      );
 
       tlRef.current.play();
 
@@ -76,6 +84,7 @@ const About = forwardRef<HTMLDivElement, AboutProps>(
     return (
       <div ref={ref} className={styles.about}>
         <button
+          ref={closeRef}
           className={styles.closeButton}
           onClick={() => {
             tlRef.current?.reverse();
