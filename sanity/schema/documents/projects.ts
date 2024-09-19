@@ -5,12 +5,25 @@ export const project = defineType({
   name: "projects",
   title: "Projects",
   fields: [
-    defineField({ name: "title", title: "Title", type: "string" }),
+    defineField({
+      name: "title",
+      title: "Title",
+      type: "string",
+      validation: (Rule) => Rule.required().error("Field is required."),
+    }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: { source: "title" },
+      validation: (Rule) => Rule.required().error("Field is required."),
+    }),
     defineField({
       name: "image",
       title: "Image",
       type: "image",
       options: { hotspot: true },
+      validation: (Rule) => Rule.required().error("Field is required."),
     }),
     defineField({
       name: "type",
@@ -20,10 +33,12 @@ export const project = defineType({
         list: [
           { title: "Commercial", value: "commercial" },
           { title: "Narrative", value: "narrative" },
-          { title: "Stills", value: "stills" },
           { title: "Music Video", value: "musicVideo" },
+          { title: "Docs", value: "Docs" },
+          { title: "Stills", value: "stills" },
         ],
       },
+      validation: (Rule) => Rule.required().error("Field is required."),
     }),
     defineField({
       name: "description",

@@ -13,6 +13,7 @@
     "watch:schema": "nodemon --watch schema --exec npm run update-schema-and-generate"
   },
   "dependencies": {
+    "@portabletext/react": "^3.1.0",
     "@react-three/drei": "^9.112.0",
     "@react-three/fiber": "^8.17.6",
     "graphql": "^16.9.0",
@@ -22,7 +23,9 @@
     "react": "^18",
     "react-dom": "^18",
     "sanity": "^3.57.1",
-    "three": "^0.168.0"
+    "sass": "^1.79.1",
+    "three": "^0.168.0",
+    "zustand": "^5.0.0-rc.2"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.2",

@@ -10,15 +10,3 @@ generates:
     config:
       fetcher: "graphql-request"
       useTypeImports: true
-  ./sanity/utils/queries.graphql:
-    plugins:
-      - "./sanity/utils/query-generator.js" # Your custom plugin
-  ./sanity/utils/introspection.json:
-    plugins:
-      - "introspection"
-
-documents: ./schema/**/*.{graphql,gql,js,ts} # Watch all files in the /schema directory
-
-watch:
-  include:
-    - ./schema/**/* # Watch all files in the /schema directory

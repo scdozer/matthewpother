@@ -260,7 +260,7 @@ export type Layout = Document & {
   _updatedAt?: Maybe<Scalars['DateTime']['output']>;
   accoladesRaw?: Maybe<Scalars['JSON']['output']>;
   address?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
+  descriptionRaw?: Maybe<Scalars['JSON']['output']>;
   email?: Maybe<Scalars['String']['output']>;
   extraInfoRaw?: Maybe<Scalars['JSON']['output']>;
   instagram?: Maybe<Scalars['String']['output']>;
@@ -278,7 +278,6 @@ export type LayoutFilter = {
   _type?: InputMaybe<StringFilter>;
   _updatedAt?: InputMaybe<DatetimeFilter>;
   address?: InputMaybe<StringFilter>;
-  description?: InputMaybe<StringFilter>;
   email?: InputMaybe<StringFilter>;
   instagram?: InputMaybe<StringFilter>;
   phone?: InputMaybe<StringFilter>;
@@ -293,15 +292,14 @@ export type LayoutSorting = {
   _type?: InputMaybe<SortOrder>;
   _updatedAt?: InputMaybe<SortOrder>;
   address?: InputMaybe<SortOrder>;
-  description?: InputMaybe<SortOrder>;
   email?: InputMaybe<SortOrder>;
   instagram?: InputMaybe<SortOrder>;
   phone?: InputMaybe<SortOrder>;
   title?: InputMaybe<SortOrder>;
 };
 
-export type Post = Document & {
-  __typename?: 'Post';
+export type Projects = Document & {
+  __typename?: 'Projects';
   /** Date the document was created */
   _createdAt?: Maybe<Scalars['DateTime']['output']>;
   /** Document ID */
@@ -313,58 +311,10 @@ export type Post = Document & {
   _type?: Maybe<Scalars['String']['output']>;
   /** Date the document was last modified */
   _updatedAt?: Maybe<Scalars['DateTime']['output']>;
-  bodyRaw?: Maybe<Scalars['JSON']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  image?: Maybe<Image>;
-  slug?: Maybe<Slug>;
-  title?: Maybe<Scalars['String']['output']>;
-};
-
-export type PostFilter = {
-  /** Apply filters on document level */
-  _?: InputMaybe<Sanity_DocumentFilter>;
-  _createdAt?: InputMaybe<DatetimeFilter>;
-  _id?: InputMaybe<IdFilter>;
-  _key?: InputMaybe<StringFilter>;
-  _rev?: InputMaybe<StringFilter>;
-  _type?: InputMaybe<StringFilter>;
-  _updatedAt?: InputMaybe<DatetimeFilter>;
-  description?: InputMaybe<StringFilter>;
-  image?: InputMaybe<ImageFilter>;
-  slug?: InputMaybe<SlugFilter>;
-  title?: InputMaybe<StringFilter>;
-};
-
-export type PostSorting = {
-  _createdAt?: InputMaybe<SortOrder>;
-  _id?: InputMaybe<SortOrder>;
-  _key?: InputMaybe<SortOrder>;
-  _rev?: InputMaybe<SortOrder>;
-  _type?: InputMaybe<SortOrder>;
-  _updatedAt?: InputMaybe<SortOrder>;
-  description?: InputMaybe<SortOrder>;
-  image?: InputMaybe<ImageSorting>;
-  slug?: InputMaybe<SlugSorting>;
-  title?: InputMaybe<SortOrder>;
-};
-
-export type Project = Document & {
-  __typename?: 'Project';
-  /** Date the document was created */
-  _createdAt?: Maybe<Scalars['DateTime']['output']>;
-  /** Document ID */
-  _id?: Maybe<Scalars['ID']['output']>;
-  _key?: Maybe<Scalars['String']['output']>;
-  /** Current document revision */
-  _rev?: Maybe<Scalars['String']['output']>;
-  /** Document type */
-  _type?: Maybe<Scalars['String']['output']>;
-  /** Date the document was last modified */
-  _updatedAt?: Maybe<Scalars['DateTime']['output']>;
-  descriptionMain?: Maybe<Scalars['String']['output']>;
   descriptionRaw?: Maybe<Scalars['JSON']['output']>;
   gallery?: Maybe<Array<Maybe<Image>>>;
   image?: Maybe<Image>;
+  slug?: Maybe<Slug>;
   title?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
   video?: Maybe<File>;
@@ -372,7 +322,7 @@ export type Project = Document & {
   videoEmbed?: Maybe<Scalars['String']['output']>;
 };
 
-export type ProjectFilter = {
+export type ProjectsFilter = {
   /** Apply filters on document level */
   _?: InputMaybe<Sanity_DocumentFilter>;
   _createdAt?: InputMaybe<DatetimeFilter>;
@@ -381,23 +331,23 @@ export type ProjectFilter = {
   _rev?: InputMaybe<StringFilter>;
   _type?: InputMaybe<StringFilter>;
   _updatedAt?: InputMaybe<DatetimeFilter>;
-  descriptionMain?: InputMaybe<StringFilter>;
   image?: InputMaybe<ImageFilter>;
+  slug?: InputMaybe<SlugFilter>;
   title?: InputMaybe<StringFilter>;
   type?: InputMaybe<StringFilter>;
   video?: InputMaybe<FileFilter>;
   videoEmbed?: InputMaybe<StringFilter>;
 };
 
-export type ProjectSorting = {
+export type ProjectsSorting = {
   _createdAt?: InputMaybe<SortOrder>;
   _id?: InputMaybe<SortOrder>;
   _key?: InputMaybe<SortOrder>;
   _rev?: InputMaybe<SortOrder>;
   _type?: InputMaybe<SortOrder>;
   _updatedAt?: InputMaybe<SortOrder>;
-  descriptionMain?: InputMaybe<SortOrder>;
   image?: InputMaybe<ImageSorting>;
+  slug?: InputMaybe<SlugSorting>;
   title?: InputMaybe<SortOrder>;
   type?: InputMaybe<SortOrder>;
   video?: InputMaybe<FileSorting>;
@@ -408,14 +358,12 @@ export type RootQuery = {
   __typename?: 'RootQuery';
   Document?: Maybe<Document>;
   Layout?: Maybe<Layout>;
-  Post?: Maybe<Post>;
-  Project?: Maybe<Project>;
+  Projects?: Maybe<Projects>;
   SanityFileAsset?: Maybe<SanityFileAsset>;
   SanityImageAsset?: Maybe<SanityImageAsset>;
   allDocument: Array<Document>;
   allLayout: Array<Layout>;
-  allPost: Array<Post>;
-  allProject: Array<Project>;
+  allProjects: Array<Projects>;
   allSanityFileAsset: Array<SanityFileAsset>;
   allSanityImageAsset: Array<SanityImageAsset>;
 };
@@ -431,12 +379,7 @@ export type RootQueryLayoutArgs = {
 };
 
 
-export type RootQueryPostArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type RootQueryProjectArgs = {
+export type RootQueryProjectsArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -467,19 +410,11 @@ export type RootQueryAllLayoutArgs = {
 };
 
 
-export type RootQueryAllPostArgs = {
+export type RootQueryAllProjectsArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<PostSorting>>;
-  where?: InputMaybe<PostFilter>;
-};
-
-
-export type RootQueryAllProjectArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ProjectSorting>>;
-  where?: InputMaybe<ProjectFilter>;
+  sort?: InputMaybe<Array<ProjectsSorting>>;
+  where?: InputMaybe<ProjectsFilter>;
 };
 
 
