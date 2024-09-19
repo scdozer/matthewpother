@@ -28,7 +28,7 @@ export default async function HomePage() {
             <h2>{project.title}</h2>
             <PortableText value={project.descriptionRaw} />
             {project.image?.asset?.url && (
-              <img src={project.image.asset.url} alt={project.title} />
+              <img src={project.image.asset.url} alt={project.title || ""} />
             )}
             <Link href={`/projects/${project?.slug?.current}`}>
               View Project
