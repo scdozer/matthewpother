@@ -143,17 +143,17 @@ const About = forwardRef<HTMLDivElement, AboutProps>(
             </div>
           </div>
 
-          {/* Accolades */}
-          <div className={styles.textSection} ref={addToTextRefs}>
-            <div className={styles.textWrapper}>
-              <PortableText value={layout.accoladesRaw} />
-            </div>
-          </div>
-
           {/* Extra Info */}
           <div className={styles.textSection} ref={addToTextRefs}>
             <div className={styles.textWrapper}>
               <PortableText value={layout.extraInfoRaw} />
+            </div>
+          </div>
+
+          {/* Accolades */}
+          <div className={styles.textSection} ref={addToTextRefs}>
+            <div className={styles.textWrapper}>
+              <PortableText value={layout.accoladesRaw} />
             </div>
           </div>
         </div>

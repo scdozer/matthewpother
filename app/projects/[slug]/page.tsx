@@ -1,9 +1,10 @@
 import { Metadata, ResolvingMetadata } from "next";
-import { PortableText } from "@portabletext/react";
 import {
   fetchProjects,
   fetchSingleProject,
 } from "../../../sanity/utils/queries";
+
+import Project from "../../components/Project";
 
 export async function generateStaticParams() {
   const projects = await fetchProjects();
@@ -36,14 +37,5 @@ export default async function ProjectPage({
     return <div>Project not found</div>;
   }
 
-  return (
-    <div>
-      <h1>{project.title}</h1>
-      <PortableText value={project.descriptionRaw} />
-      {project.image?.asset?.url && (
-        <img src={project.image.asset.url} alt={project.title || ""} />
-      )}
-      {/* Render other project details */}
-    </div>
-  );
+  return <Project project={project} />;
 }

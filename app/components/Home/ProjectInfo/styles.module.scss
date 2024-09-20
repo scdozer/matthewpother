@@ -3,7 +3,7 @@
   top: 70%;
   left: 50%;
   width: 60%;
-  height: 200px;
+  height: 150px;
   z-index: 1;
   overflow: hidden;
 }
@@ -29,8 +29,9 @@
   }
 
   a {
+    font-size: 0.8rem;
     display: block;
-    margin-top: 30px;
+    margin-top: 20px;
     color: #fff;
   }
 }
