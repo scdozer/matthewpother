@@ -40,15 +40,15 @@ export default function Layout({ layout }: { layout: SanityLayout }) {
     gsap.to(titleRef.current, {
       opacity: 1,
       y: 0,
-      duration: 0.5,
-      delay: 0.25,
+      duration: 1,
+      delay: 1,
       ease: "power2.out",
     });
     gsap.to(descriptionRef.current, {
       opacity: 1,
       y: 0,
-      duration: 0.5,
-      delay: 0.25,
+      duration: 1,
+      delay: 1,
       ease: "power2.out",
     });
   }, []);
@@ -59,11 +59,8 @@ export default function Layout({ layout }: { layout: SanityLayout }) {
         <h1 ref={titleRef}>
           <Link href="/">{layout.title}</Link>
         </h1>
-        <div
-          ref={descriptionRef}
-          onClick={() => setShowAbout(true)}
-          style={{ cursor: "pointer" }}
-        >
+        <div ref={descriptionRef}>
+          <button onClick={() => setShowAbout(true)}>more info</button>
           <PortableText value={layout.descriptionRaw} />
         </div>
       </div>

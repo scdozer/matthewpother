@@ -45,7 +45,7 @@ const About = forwardRef<HTMLDivElement, AboutProps>(
         imageRef.current,
         { clipPath: "inset(100% 0% 0% 0%)" },
         { clipPath: "inset(0% 0% 0% 0%)", duration: 0.5, ease: "power2.out" },
-        0.25
+        0.5
       );
 
       tlRef.current.fromTo(

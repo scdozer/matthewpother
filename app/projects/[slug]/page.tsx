@@ -19,9 +19,9 @@ export async function generateMetadata(
   const project = await fetchSingleProject(params.slug);
 
   return {
-    title: `Mathew Pothier - ${project?.title || "Project"}`,
+    title: `Matthew Pothier - ${project?.title || "Project"}`,
     description:
-      "Mathew Pothier is a Los Angeles based cinematographer and director of photography, specializing in commercial, narrative, and documentary work.",
+      "Matthew Pothier is a Los Angeles based cinematographer and director of photography, specializing in commercial, narrative, and documentary work.",
   };
 }
 

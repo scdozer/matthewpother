@@ -5,7 +5,7 @@
   left: 0;
   width: 100%;
 
-  z-index: 0;
+  z-index: 2;
 }
 
 .content {
@@ -14,12 +14,19 @@
   right: 0;
   width: 100%;
   display: grid;
-  grid-template-columns: 5fr 1fr;
+  grid-template-columns: 2fr 1fr;
   padding: 1rem;
   h1,
   div {
     opacity: 0;
     transform: translateY(-40px);
+  }
+  div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
   }
   h1 {
     font-size: 1.2rem;
@@ -27,5 +34,11 @@
   }
   p {
     font-size: 0.8rem;
+  }
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    width: 200px;
   }
 }

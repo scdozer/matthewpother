@@ -41,7 +41,7 @@ export const getLayout = gql`
 
 export const getProjects = gql`
   query getProjects {
-    allProjects {
+    allProjects(sort: [{ type: ASC }, { _createdAt: DESC }]) {
       _id
       title
       slug {
@@ -113,7 +113,10 @@ export async function fetchLayout(): Promise<Layout> {
 
 export async function fetchProjects(): Promise<Projects[]> {
   const data = await fetchSanityData<RootQuery>(getProjects);
-  return data.allProjects;
+  const typeOrder = ["narrative", "Docs", "musicVideo", "commercial", "stills"];
+  return data.allProjects.sort(
+    (a, b) => typeOrder.indexOf(a.type ?? "") - typeOrder.indexOf(b.type ?? "")
+  );
 }
 
 export async function fetchSingleProject(
