@@ -1,6 +1,6 @@
 .container {
   position: fixed;
-  height: 100vh;
+  height: 100%;
   width: 100vw;
   overflow: hidden;
   z-index: 1;
@@ -9,7 +9,7 @@
 .scrollElement {
   position: relative;
   width: 100%;
-  height: 200vh;
+  height: 600vh;
   overflow: scroll;
 }
 

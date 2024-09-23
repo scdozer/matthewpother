@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useLayoutEffect } from "react";
 import Image from "next/image";
 import { Projects } from "@/sanity/utils/graphql";
 import { gsap } from "gsap";
@@ -22,7 +22,7 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
   const bottomImagesRef = useRef<(HTMLDivElement | null)[]>([]);
   const mainImageContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const container = containerRef.current;
     const scrollElement = scrollRef.current;
     const mainImages = mainImagesRef.current;
@@ -41,9 +41,6 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
             autoKill: false,
           },
           ease: "power2.inOut",
-          // onComplete: () => {
-          //   ScrollTrigger.refresh();
-          // },
         });
       }
     });
@@ -64,6 +61,7 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
       },
       "<"
     );
+
     introTl.add(() => {
       if (typeof window !== "undefined") {
         const scrollDistance =
@@ -76,9 +74,6 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
             autoKill: false,
           },
           ease: "power2.inOut",
-          // onComplete: () => {
-          //   ScrollTrigger.refresh();
-          // },
         });
       }
     });
@@ -89,7 +84,7 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
         trigger: scrollElement,
         start: "top top",
         end: "bottom bottom",
-        scrub: 2.5,
+        scrub: 1.5,
         pinSpacing: false,
         snap: {
           snapTo: 1 / projects.length,
