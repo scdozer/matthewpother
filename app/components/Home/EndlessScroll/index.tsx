@@ -44,8 +44,8 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
         opacity: 1,
         y: 0,
         stagger: 0.1,
-        ease: "power2.out",
-        duration: 0.2,
+        ease: "none",
+        duration: 1,
       });
 
       introTl.set(
@@ -54,7 +54,7 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
           opacity: 1,
           y: 0,
         },
-        "<"
+        "<+=0.8"
       );
 
       const scrollPosition = projectHeight;
