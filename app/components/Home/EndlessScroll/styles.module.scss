@@ -48,9 +48,20 @@
 }
 
 .bottomImage {
+  cursor: pointer;
   flex: 0 0 10%;
   position: relative;
   height: 100%;
   opacity: 0;
   transform: translateY(60px);
+  overflow: hidden;
+  img {
+    transition: transform 0.3s ease-in-out;
+  }
+  &:hover {
+    img {
+      transition: transform 0.3s ease-in-out;
+      transform: scale(1.2);
+    }
+  }
 }

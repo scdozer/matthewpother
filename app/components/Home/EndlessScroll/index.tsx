@@ -8,8 +8,7 @@ import ProjectInfo from "../ProjectInfo";
 
 import styles from "./styles.module.scss";
 
-gsap.registerPlugin(ScrollTrigger);
-gsap.registerPlugin(ScrollToPlugin);
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 interface EndlessScrollProps {
   projects: Projects[];
@@ -30,123 +29,130 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
 
     if (!container || !scrollElement) return;
 
-    const introTl = gsap.timeline();
+    const totalProjects = projects.length;
+    const projectHeight = window.innerHeight;
+    scrollElement.style.height = `${projectHeight * (totalProjects + 1)}px`;
 
-    introTl.add(() => {
-      if (typeof window !== "undefined") {
-        gsap.to(window, {
-          duration: 0.5,
-          scrollTo: {
-            y: 0,
-            autoKill: false,
-          },
-          ease: "power2.inOut",
-        });
-      }
-    });
+    const createIntroAnimation = () => {
+      const introTl = gsap.timeline();
 
-    introTl.to(bottomImages.slice(0, 10), {
-      opacity: 1,
-      y: 0,
-      stagger: 0.1,
-      ease: "power2.out",
-      duration: 0.8,
-    });
+      introTl.set(window, {
+        scrollTo: { y: 0, autoKill: false },
+      });
 
-    introTl.set(
-      bottomImages.slice(10),
-      {
+      introTl.to(bottomImages.slice(0, 10), {
         opacity: 1,
         y: 0,
-      },
-      "<"
-    );
+        stagger: 0.1,
+        ease: "power2.out",
+        duration: 0.8,
+      });
 
-    introTl.add(() => {
-      if (typeof window !== "undefined") {
-        const scrollDistance =
-          (mainImageContainerRef.current?.offsetHeight || 0) *
-          (1.3 / projects.length);
-        gsap.to(window, {
-          duration: 0.5,
-          scrollTo: {
-            y: scrollDistance,
-            autoKill: false,
-          },
-          ease: "power2.inOut",
-        });
-      }
-    });
-
-    let st: ScrollTrigger;
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: scrollElement,
-        start: "top top",
-        end: "bottom bottom",
-        scrub: 1.5,
-        pinSpacing: false,
-        snap: {
-          snapTo: 1 / projects.length,
-          duration: { min: 0.2, max: 0.5 },
-          ease: "power2.out",
-        },
-        // onRefreshInit: (self: ScrollTrigger) => {
-        //   st = self;
-        // },
-      },
-    });
-
-    tl.to(
-      mainImages,
-      {
-        yPercent: -100 * projects.length,
-        duration: projects.length,
-        ease: "none",
-      },
-      0
-    );
-
-    tl.to(
-      bottomImages,
-      {
-        xPercent: -100 * (projects.length - 1),
-        duration: projects.length - 1,
-        ease: "none",
-      },
-      0
-    );
-
-    bottomImages.forEach((image, index) => {
-      tl.to(
-        image,
+      introTl.set(
+        bottomImages.slice(10),
         {
-          yPercent: -100,
-          duration: 1,
-          ease: "none",
-        },
-        index
-      );
-    });
-
-    projects.forEach((_, index) => {
-      tl.fromTo(
-        mainImages[index],
-        { scale: 0.8, opacity: 0.3 },
-        {
-          scale: 1,
           opacity: 1,
-          duration: 0.75,
-          ease: "none",
-          yoyo: true,
+          y: 0,
         },
-        index
+        "<"
       );
-    });
+
+      const scrollPosition = projectHeight * 1;
+      introTl.to(window, {
+        duration: 0.5,
+        scrollTo: { y: scrollPosition, autoKill: false },
+        ease: "power2.inOut",
+      });
+
+      return introTl;
+    };
+
+    const createMainAnimation = () => {
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: scrollElement,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 1,
+          snap: {
+            snapTo: (value) =>
+              Math.round(value * totalProjects) / totalProjects,
+            duration: { min: 0.2, max: 0.3 },
+            ease: "power1.inOut",
+          },
+        },
+      });
+
+      tl.to(
+        mainImages,
+        {
+          yPercent: -100 * totalProjects,
+          duration: totalProjects,
+          ease: "none",
+        },
+        0
+      );
+
+      tl.to(
+        bottomImages,
+        {
+          xPercent: -100 * (totalProjects - 1),
+          duration: totalProjects - 1,
+          ease: "none",
+        },
+        0
+      );
+
+      bottomImages.forEach((image, index) => {
+        tl.to(
+          image,
+          {
+            yPercent: -100,
+            duration: 1,
+            ease: "none",
+          },
+          index
+        );
+      });
+
+      projects.forEach((_, index) => {
+        tl.fromTo(
+          mainImages[index],
+          { scale: 0.8, opacity: 0.3 },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.75,
+            ease: "none",
+            yoyo: true,
+          },
+          index
+        );
+      });
+
+      return tl;
+    };
+
+    const setupClickHandlers = () => {
+      bottomImages.forEach((image, index) => {
+        image?.addEventListener("click", () => {
+          const scrollPosition = projectHeight * (index + 1);
+          gsap.to(window, {
+            duration: 0.5,
+            scrollTo: { y: scrollPosition, autoKill: false },
+            ease: "power2.inOut",
+          });
+        });
+      });
+    };
+
+    const introTl = createIntroAnimation();
+    const mainTl = createMainAnimation();
+    setupClickHandlers();
 
     return () => {
       introTl.kill();
-      tl.kill();
+      mainTl.kill();
       ScrollTrigger.getAll().forEach((t) => t.kill());
     };
   }, [projects]);
