@@ -40,16 +40,16 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
         scrollTo: { y: 0, autoKill: false },
       });
 
-      introTl.to(bottomImages.slice(0, 10), {
+      introTl.to(bottomImages.slice(0, 11), {
         opacity: 1,
         y: 0,
         stagger: 0.1,
         ease: "power2.out",
-        duration: 0.8,
+        duration: 0.2,
       });
 
       introTl.set(
-        bottomImages.slice(10),
+        bottomImages.slice(11),
         {
           opacity: 1,
           y: 0,
@@ -57,11 +57,13 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
         "<"
       );
 
-      const scrollPosition = projectHeight * 1;
-      introTl.to(window, {
-        duration: 0.5,
-        scrollTo: { y: scrollPosition, autoKill: false },
-        ease: "power2.inOut",
+      const scrollPosition = projectHeight;
+      introTl.add(() => {
+        gsap.to(window, {
+          duration: 0.5,
+          scrollTo: { y: scrollPosition, autoKill: false },
+          ease: "power2.inOut",
+        });
       });
 
       return introTl;
@@ -86,8 +88,8 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
       tl.to(
         mainImages,
         {
-          yPercent: -100 * totalProjects,
-          duration: totalProjects,
+          yPercent: -100 * (totalProjects - 1),
+          duration: totalProjects - 1,
           ease: "none",
         },
         0
