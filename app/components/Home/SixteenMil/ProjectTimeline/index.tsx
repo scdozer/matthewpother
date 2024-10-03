@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -22,6 +22,13 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
   const projectInfoRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const projectItemsRef = useRef<(HTMLDivElement | null)[]>([]);
+
+  const setProjectItemRef = useCallback(
+    (el: HTMLDivElement | null, index: number) => {
+      projectItemsRef.current[index] = el;
+    },
+    []
+  );
 
   useEffect(() => {
     if (redLineRef.current && timelineRef.current && projectInfoRef.current) {
@@ -111,7 +118,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
                 onProjectChange(index);
                 tlRef.current?.progress(index / projects.length);
               }}
-              ref={(el) => (projectItemsRef.current[index] = el)}
+              ref={(el) => setProjectItemRef(el, index)}
             >
               <Image
                 src={project?.image?.asset?.url || ""}
