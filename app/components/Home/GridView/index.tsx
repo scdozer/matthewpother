@@ -83,14 +83,14 @@ const GridView: React.FC<GridViewProps> = ({
       animateOut();
     }
   }, [isTransitioning, animateIn, animateOut]);
+
   const projectsByType = projects.reduce<Record<string, Projects[]>>(
     (acc, project) => {
-      if (project.type) {
-        if (!acc[project.type]) {
-          acc[project.type] = [];
-        }
-        acc[project.type].push(project);
+      const type = project.type || "Uncategorized";
+      if (!acc[type]) {
+        acc[type] = [];
       }
+      acc[type].push(project);
       return acc;
     },
     {}
