@@ -1,7 +1,6 @@
 import React, { useState, useCallback } from "react";
 import { Projects } from "@/sanity/utils/graphql";
 import ScrollView from "./ScrollView";
-import GridView from "./GridView";
 import styles from "./styles.module.scss";
 
 interface EndlessScrollProps {
@@ -34,13 +33,6 @@ const EndlessScroll: React.FC<EndlessScrollProps> = ({ projects }) => {
       </button>
       {!isGridView && (
         <ScrollView
-          projects={projects}
-          isTransitioning={isTransitioning}
-          onTransitionComplete={onTransitionComplete}
-        />
-      )}
-      {isGridView && (
-        <GridView
           projects={projects}
           isTransitioning={isTransitioning}
           onTransitionComplete={onTransitionComplete}
