@@ -20,6 +20,24 @@
 
 .gridProject {
   text-align: center;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  padding-bottom: 100%; // This creates a 1:1 aspect ratio
+  overflow: hidden;
+  img {
+    transition: all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+  &:hover {
+    img {
+      transform: scale(1.2);
+    }
+  }
 }
 
 .gridProjectTitle {
