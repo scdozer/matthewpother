@@ -146,6 +146,8 @@ export type FileFilter = {
   asset?: InputMaybe<SanityFileAssetFilter>;
 };
 
+export type FileOrImage = File | Image;
+
 export type FileSorting = {
   _key?: InputMaybe<SortOrder>;
   _type?: InputMaybe<SortOrder>;
@@ -315,8 +317,10 @@ export type Projects = Document & {
   /** Date the document was last modified */
   _updatedAt?: Maybe<Scalars['DateTime']['output']>;
   descriptionRaw?: Maybe<Scalars['JSON']['output']>;
-  gallery?: Maybe<Array<Maybe<Image>>>;
+  featured?: Maybe<Scalars['Boolean']['output']>;
+  gallery?: Maybe<Array<Maybe<FileOrImage>>>;
   image?: Maybe<Image>;
+  mainVideo?: Maybe<File>;
   slug?: Maybe<Slug>;
   title?: Maybe<Scalars['String']['output']>;
   type?: Maybe<Scalars['String']['output']>;
@@ -334,7 +338,9 @@ export type ProjectsFilter = {
   _rev?: InputMaybe<StringFilter>;
   _type?: InputMaybe<StringFilter>;
   _updatedAt?: InputMaybe<DatetimeFilter>;
+  featured?: InputMaybe<BooleanFilter>;
   image?: InputMaybe<ImageFilter>;
+  mainVideo?: InputMaybe<FileFilter>;
   slug?: InputMaybe<SlugFilter>;
   title?: InputMaybe<StringFilter>;
   type?: InputMaybe<StringFilter>;
@@ -349,7 +355,9 @@ export type ProjectsSorting = {
   _rev?: InputMaybe<SortOrder>;
   _type?: InputMaybe<SortOrder>;
   _updatedAt?: InputMaybe<SortOrder>;
+  featured?: InputMaybe<SortOrder>;
   image?: InputMaybe<ImageSorting>;
+  mainVideo?: InputMaybe<FileSorting>;
   slug?: InputMaybe<SlugSorting>;
   title?: InputMaybe<SortOrder>;
   type?: InputMaybe<SortOrder>;

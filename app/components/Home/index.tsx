@@ -1,9 +1,6 @@
 "use client";
-import React, { useRef, useEffect, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
 import { Projects } from "../../../sanity/utils/graphql";
-
-import EndlessScrollContent from "./EndlessScroll";
+import SixteenMil from "../Home/SixteenMil";
 
 interface EndlessScrollCanvasProps {
   projects: Projects[];
@@ -12,7 +9,7 @@ interface EndlessScrollCanvasProps {
 const EndlessScrollCanvas: React.FC<EndlessScrollCanvasProps> = ({
   projects,
 }) => {
-  return <EndlessScrollContent projects={projects} />;
+  return <SixteenMil projects={projects} />;
 };
 
 export default EndlessScrollCanvas;

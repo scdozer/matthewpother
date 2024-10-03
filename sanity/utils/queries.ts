@@ -59,7 +59,14 @@ export const getProjects = gql`
           }
         }
       }
+      mainVideo {
+        asset {
+          url
+          originalFilename
+        }
+      }
       type
+      featured
     }
   }
 `;
@@ -74,13 +81,23 @@ export const getSingleProject = gql`
       }
       descriptionRaw
       gallery {
-        asset {
-          url
-          metadata {
-            dimensions {
-              width
-              height
+        ... on Image {
+          asset {
+            _type
+            url
+            metadata {
+              dimensions {
+                width
+                height
+              }
             }
+          }
+        }
+        ... on File {
+          asset {
+            _type
+            url
+            originalFilename
           }
         }
       }
@@ -99,9 +116,17 @@ export const getSingleProject = gql`
       video {
         asset {
           url
+          originalFilename
+        }
+      }
+      mainVideo {
+        asset {
+          url
+          originalFilename
         }
       }
       videoEmbed
+      featured
     }
   }
 `;
