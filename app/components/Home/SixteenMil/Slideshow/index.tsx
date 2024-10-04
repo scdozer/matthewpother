@@ -83,13 +83,7 @@ function Slideshow({ projects, currentIndex }: SlideshowProps) {
 
   useEffect(() => {
     renderCountRef.current += 1;
-    console.log(`Slideshow render count: ${renderCountRef.current}`);
   });
-
-  useEffect(() => {
-    console.log(`Slideshow currentIndex changed to: ${currentIndex}`);
-  }, [currentIndex]);
-
   const images = useMemo(
     () => projects.map((project) => project.image?.asset?.url || ""),
     [projects]

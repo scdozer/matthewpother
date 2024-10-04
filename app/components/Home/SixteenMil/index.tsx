@@ -18,6 +18,7 @@ import GridView from "../GridView";
 import { gsap } from "gsap";
 import styles from "./styles.module.scss";
 import { useRouter } from "next/navigation";
+import LayeredCard from "./LayeredCards";
 
 interface SixteenMilProps {
   projects: Projects[];
@@ -123,14 +124,18 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
               <pointLight position={[10, 10, 10]} intensity={0.8} />
               <Suspense fallback={null}>
                 <ResponsiveGroup>
-                  <FilmFrame position={[0, 0, -0.05]} />
+                  {/* <FilmFrame position={[0, 0, -0.05]} />
                   <GrainOverlay position={[0, 0, -0.05]} />
                   <Slideshow
                     projects={featuredProjects}
                     currentIndex={currentIndex}
                   />
                   <GrainOverlay />
-                  <FilmFrame />
+                  <FilmFrame /> */}
+                  <LayeredCard
+                    projects={featuredProjects}
+                    currentIndex={currentIndex}
+                  />
                 </ResponsiveGroup>
                 <OrbitControls enableZoom={false} />
               </Suspense>

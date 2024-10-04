@@ -35,13 +35,14 @@
 
   button {
     margin-top: 5px;
-    font-size: 0.7rem;
+    font-size: 0.8rem;
     text-align: left;
-    background: black;
     border: none;
     cursor: pointer;
     color: white;
     width: auto;
+    display: block;
+    background: none;
   }
   p {
     font-size: 0.7rem;
