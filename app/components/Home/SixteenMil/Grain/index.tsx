@@ -39,7 +39,7 @@ const AlphaMaskMaterial = shaderMaterial(
       float mask = 1.0 - filmColor.a;
       
       vec3 grainLightMix = mix(grainColor.rgb, lightColor.rgb, 0.5);
-      vec3 finalColor = mix(grainLightMix, vec3(1.0), grainIntensity);
+      vec3 finalColor = mix(vec3(1.0), grainLightMix, grainIntensity);
       
       gl_FragColor = vec4(finalColor, mask * opacity);
     }
@@ -78,8 +78,12 @@ function GrainOverlay({ position = [0, 0, 0.1] }: GrainOverlayProps) {
     const grainVideo = (grainTexture as VideoTexture).source.data;
     const lightVideo = (lightTexture as VideoTexture).source.data;
 
-    grainVideoRef.current = grainVideo;
-    lightVideoRef.current = lightVideo;
+    if (grainVideoRef.current) {
+      grainVideoRef.current.src = grainVideo.src;
+    }
+    if (lightVideoRef.current) {
+      lightVideoRef.current.src = lightVideo.src;
+    }
 
     grainVideo.playbackRate = 0.25;
     lightVideo.playbackRate = 0.25;
@@ -87,10 +91,14 @@ function GrainOverlay({ position = [0, 0, 0.1] }: GrainOverlayProps) {
     const playVideos = () => {
       grainVideo
         .play()
-        .catch((error) => console.error("Error playing grain video:", error));
+        .catch((error: any) =>
+          console.error("Error playing grain video:", error)
+        );
       lightVideo
         .play()
-        .catch((error) => console.error("Error playing light video:", error));
+        .catch((error: any) =>
+          console.error("Error playing light video:", error)
+        );
     };
 
     playVideos();
