@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect, useState } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useTexture } from "@react-three/drei";
 import * as THREE from "three";
@@ -13,7 +13,8 @@ interface LayeredCardProps {
 const LayeredCard = ({ projects, currentIndex }: LayeredCardProps) => {
   const groupRef = useRef<THREE.Group>();
   const planeRefs = useRef<THREE.Mesh[]>([]);
-  const [transitionProgress, setTransitionProgress] = useState(0);
+  const transitionProgressRef = useRef(0);
+  const prevIndexRef = useRef(currentIndex);
 
   const planeCount = 15;
   const distance = 0.03;
@@ -56,25 +57,32 @@ const LayeredCard = ({ projects, currentIndex }: LayeredCardProps) => {
   }, [textures, displacementTexture]);
 
   useEffect(() => {
-    const texture1Index = currentIndex;
-    const texture2Index =
-      (currentIndex - 1 + projects.length) % projects.length;
-    uniforms.forEach((u) => {
-      u.uTexture1.value = textures[texture1Index];
-      u.uTexture2.value = textures[texture2Index];
-      u.uProgress.value = 0;
-    });
-    setTransitionProgress(0);
+    if (currentIndex !== prevIndexRef.current) {
+      const texture1Index = currentIndex;
+      const texture2Index =
+        (prevIndexRef.current + projects.length) % projects.length;
+      uniforms.forEach((u) => {
+        u.uTexture1.value = textures[texture1Index];
+        u.uTexture2.value = textures[texture2Index];
+        u.uProgress.value = 0;
+      });
+      transitionProgressRef.current = 0;
 
-    // Animate the transition
-    gsap.to(
-      uniforms.map((u) => u.uProgress),
-      {
-        value: 1,
+      // Animate the transition
+      gsap.to(transitionProgressRef, {
+        current: 1,
         duration: 1,
         ease: "power2.inOut",
-      }
-    );
+        onUpdate: () => {
+          uniforms.forEach((u) => {
+            u.uProgress.value = transitionProgressRef.current;
+          });
+        },
+        onComplete: () => {
+          prevIndexRef.current = currentIndex;
+        },
+      });
+    }
   }, [currentIndex, textures, uniforms, projects.length]);
 
   const patch =
@@ -134,21 +142,12 @@ const LayeredCard = ({ projects, currentIndex }: LayeredCardProps) => {
     };
 
   useFrame(() => {
-    setTransitionProgress((prev) => {
-      const newProgress = Math.min(prev + 0.01, 1);
-      uniforms.forEach((u) => {
-        u.uProgress.value = newProgress;
-      });
-      return newProgress;
+    // Remove setTransitionProgress and directly update uniforms
+    const newProgress = Math.min(transitionProgressRef.current + 0.01, 1);
+    uniforms.forEach((u) => {
+      u.uProgress.value = newProgress;
     });
-
-    // planeRefs.current.forEach((plane, index) => {
-    //   if (plane) {
-    //     const offset = index * 0.5;
-    //     // plane.position.x = Math.sin(time + offset) * 0.05;
-    //     // plane.position.y = Math.cos(time + offset) * 0.05;
-    //   }
-    // });
+    transitionProgressRef.current = newProgress;
   });
 
   const planes = useMemo(() => {

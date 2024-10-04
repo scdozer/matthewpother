@@ -76,8 +76,6 @@ const DisplacementShaderMaterial = shaderMaterial(
 extend({ DisplacementShaderMaterial });
 
 function Slideshow({ projects, currentIndex }: SlideshowProps) {
-  console.log(`Slideshow render, currentIndex: ${currentIndex}`);
-
   const renderCountRef = useRef(0);
   const prevIndexRef = useRef(currentIndex);
 
