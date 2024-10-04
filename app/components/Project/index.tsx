@@ -1,9 +1,9 @@
 "use client";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import ReactPlayer from "react-player";
-import Image from "next/image";
 import { PortableText } from "@portabletext/react";
 import { Projects } from "@/sanity/utils/graphql";
 import styles from "./style.module.scss";
@@ -14,8 +14,11 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Project({ project }: { project: Projects }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
+
     if (containerRef.current) {
       const textElements =
         containerRef.current.querySelectorAll(".animate-text");
@@ -35,15 +38,15 @@ export default function Project({ project }: { project: Projects }) {
     if (imagesRef.current) {
       const images = gsap.utils.toArray(imagesRef.current.children);
 
-      images.forEach((image: any, index: number) => {
+      images.forEach((image: any) => {
         gsap.set(image, {
           clipPath: "inset(100% 0% 0% 0%)",
         });
 
         ScrollTrigger.create({
           trigger: image,
-          start: "top 50%",
-          end: "bottom top",
+          start: "top bottom",
+          end: "top 50%",
           onEnter: () => {
             gsap.to(image, {
               clipPath: "inset(0% 0% 0% 0%)",
@@ -75,6 +78,10 @@ export default function Project({ project }: { project: Projects }) {
     return item.asset && item.asset._type === "sanity.fileAsset";
   };
 
+  if (!isClient) {
+    return null; // or a loading spinner
+  }
+
   return (
     <div ref={containerRef} className={styles.container}>
       <div className={styles.content}>
@@ -92,7 +99,7 @@ export default function Project({ project }: { project: Projects }) {
             {isImageAsset(item) && (
               <Image
                 src={item?.asset?.url || ""}
-                alt={`Project image ${index}`}
+                alt={`Project image`}
                 width={item?.asset?.metadata?.dimensions?.width || 1000}
                 height={item?.asset?.metadata?.dimensions?.height || 1000}
                 style={{ width: "100%", height: "auto" }}
