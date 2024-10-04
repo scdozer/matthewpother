@@ -18,8 +18,26 @@
   gap: 1rem;
 }
 
+@media (max-width: 1200px) {
+  .gridProjects {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .gridProjects {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .gridProjects {
+    grid-template-columns: 1fr;
+  }
+}
+
 .gridProject {
-  text-align: center;
+  text-align: left;
   text-decoration: none;
   color: inherit;
   display: block;

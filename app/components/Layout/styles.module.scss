@@ -16,6 +16,11 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   padding: 1rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
   h1,
   div {
     opacity: 0;
@@ -27,6 +32,10 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: 20px;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+    }
   }
   h1 {
     font-size: 1.2rem;
@@ -40,5 +49,8 @@
     border: none;
     cursor: pointer;
     width: 200px;
+    @media (max-width: 768px) {
+      width: auto;
+    }
   }
 }
