@@ -1,6 +1,19 @@
-import { Canvas, useThree, useFrame } from "@react-three/fiber";
-import { Suspense, useMemo, useEffect, useState, useRef } from "react";
-import { OrbitControls, PerspectiveCamera, Loader } from "@react-three/drei";
+import {
+  Canvas,
+  useThree,
+  useFrame,
+  AmbientLight,
+  PointLight,
+} from "@react-three/fiber";
+import {
+  Suspense,
+  useMemo,
+  useEffect,
+  useState,
+  useRef,
+  useCallback,
+} from "react";
+import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import Slideshow from "./Slideshow";
 import GrainOverlay from "./Grain";
 import FilmFrame from "./FilmFrame";
@@ -63,9 +76,14 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
     [projects]
   );
 
-  const handleProjectChange = (index: number) => {
+  const handleProjectChange = useCallback((index: number) => {
+    console.log(`handleProjectChange called with index: ${index}`);
     setCurrentIndex(index);
-  };
+  }, []);
+
+  useEffect(() => {
+    console.log(`currentIndex updated to: ${currentIndex}`);
+  }, [currentIndex]);
 
   const handleViewChange = () => {
     setIsTransitioning(true);
@@ -118,8 +136,12 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
           <div className="canvas-container">
             <Canvas>
               <PerspectiveCamera makeDefault position={[0, 0, 5]} />
+              <ambientLight intensity={0.5} />
+              <pointLight position={[10, 10, 10]} intensity={0.8} />
               <Suspense fallback={null}>
                 <ResponsiveGroup>
+                  <FilmFrame position={[0, 0, -0.05]} />
+                  <GrainOverlay position={[0, 0, -0.05]} />
                   <Slideshow
                     projects={featuredProjects}
                     currentIndex={currentIndex}

@@ -15,6 +15,7 @@ const AlphaMaskMaterial = shaderMaterial(
     lightTexture: null,
     filmTexture: null,
     opacity: 0.5,
+    grainIntensity: 0.4,
   },
   `
     varying vec2 vUv;
@@ -28,16 +29,18 @@ const AlphaMaskMaterial = shaderMaterial(
     uniform sampler2D lightTexture;
     uniform sampler2D filmTexture;
     uniform float opacity;
+    uniform float grainIntensity;
     varying vec2 vUv;
     void main() {
       vec4 filmColor = texture2D(filmTexture, vUv);
       vec4 grainColor = texture2D(grainTexture, vUv);
       vec4 lightColor = texture2D(lightTexture, vUv);
       
-      // Use the inverse of the film's alpha channel as a mask
       float mask = 1.0 - filmColor.a;
       
-      vec3 finalColor = mix(grainColor.rgb, lightColor.rgb, 0.5);
+      vec3 grainLightMix = mix(grainColor.rgb, lightColor.rgb, 0.5);
+      vec3 finalColor = mix(grainLightMix, vec3(1.0), grainIntensity);
+      
       gl_FragColor = vec4(finalColor, mask * opacity);
     }
   `
@@ -45,7 +48,11 @@ const AlphaMaskMaterial = shaderMaterial(
 
 extend({ AlphaMaskMaterial });
 
-function GrainOverlay() {
+interface GrainOverlayProps {
+  position?: [number, number, number];
+}
+
+function GrainOverlay({ position = [0, 0, 0.1] }: GrainOverlayProps) {
   const grainVideoRef = useRef<HTMLVideoElement>(null);
   const lightVideoRef = useRef<HTMLVideoElement>(null);
 
@@ -53,12 +60,14 @@ function GrainOverlay() {
     loop: true,
     muted: true,
     crossOrigin: "anonymous",
+    start: false,
   });
 
   const lightTexture = useVideoTexture("/film/light-overlay.mp4", {
     loop: true,
     muted: true,
     crossOrigin: "anonymous",
+    start: false,
   });
 
   const filmTexture = useTexture("/film/super8.png");
@@ -66,20 +75,51 @@ function GrainOverlay() {
   const materialRef = useRef<ShaderMaterial>(null);
 
   useEffect(() => {
-    if (grainVideoRef.current) {
-      grainVideoRef.current.playbackRate = 0.25;
-    }
-    if (lightVideoRef.current) {
-      lightVideoRef.current.playbackRate = 0.25;
-    }
-  }, []);
+    const grainVideo = (grainTexture as VideoTexture).source.data;
+    const lightVideo = (lightTexture as VideoTexture).source.data;
+
+    grainVideoRef.current = grainVideo;
+    lightVideoRef.current = lightVideo;
+
+    grainVideo.playbackRate = 0.25;
+    lightVideo.playbackRate = 0.25;
+
+    const playVideos = () => {
+      grainVideo
+        .play()
+        .catch((error) => console.error("Error playing grain video:", error));
+      lightVideo
+        .play()
+        .catch((error) => console.error("Error playing light video:", error));
+    };
+
+    playVideos();
+
+    const handleUserInteraction = () => {
+      playVideos();
+      window.removeEventListener("click", handleUserInteraction);
+      window.removeEventListener("touchstart", handleUserInteraction);
+    };
+
+    window.addEventListener("click", handleUserInteraction);
+    window.addEventListener("touchstart", handleUserInteraction);
+
+    return () => {
+      window.removeEventListener("click", handleUserInteraction);
+      window.removeEventListener("touchstart", handleUserInteraction);
+    };
+  }, [grainTexture, lightTexture]);
 
   useFrame(() => {
     if (grainVideoRef.current && grainVideoRef.current.paused) {
-      grainVideoRef.current.play();
+      grainVideoRef.current
+        .play()
+        .catch((error) => console.error("Error playing grain video:", error));
     }
     if (lightVideoRef.current && lightVideoRef.current.paused) {
-      lightVideoRef.current.play();
+      lightVideoRef.current
+        .play()
+        .catch((error) => console.error("Error playing light video:", error));
     }
   });
 
@@ -97,7 +137,7 @@ function GrainOverlay() {
   );
 
   return (
-    <Plane args={[2, 1]} position={[0, 0, 0.1]}>
+    <Plane args={[2, 1]} position={position}>
       {/* @ts-ignore */}
       <alphaMaskMaterial ref={materialRef} {...materialProps} />
     </Plane>

@@ -1,10 +1,10 @@
-import { useFrame } from "@react-three/fiber";
-import { useState, useRef, useMemo, useEffect } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { Plane, useTexture, shaderMaterial } from "@react-three/drei";
 import * as THREE from "three";
 import { Projects } from "@/sanity/utils/graphql";
 import { extend } from "@react-three/fiber";
 import { gsap } from "gsap";
+import { DoubleSide } from "three";
 
 interface SlideshowProps {
   projects: Projects[];
@@ -76,7 +76,19 @@ const DisplacementShaderMaterial = shaderMaterial(
 extend({ DisplacementShaderMaterial });
 
 function Slideshow({ projects, currentIndex }: SlideshowProps) {
-  const [prevIndex, setPrevIndex] = useState(currentIndex);
+  console.log(`Slideshow render, currentIndex: ${currentIndex}`);
+
+  const renderCountRef = useRef(0);
+  const prevIndexRef = useRef(currentIndex);
+
+  useEffect(() => {
+    renderCountRef.current += 1;
+    console.log(`Slideshow render count: ${renderCountRef.current}`);
+  });
+
+  useEffect(() => {
+    console.log(`Slideshow currentIndex changed to: ${currentIndex}`);
+  }, [currentIndex]);
 
   const images = useMemo(
     () => projects.map((project) => project.image?.asset?.url || ""),
@@ -89,24 +101,25 @@ function Slideshow({ projects, currentIndex }: SlideshowProps) {
   const planeRef = useRef<THREE.Mesh>(null);
 
   useEffect(() => {
-    if (currentIndex !== prevIndex) {
+    if (currentIndex !== prevIndexRef.current) {
       gsap.to(materialRef.current!.uniforms.uProgress, {
         value: 1,
         duration: 1,
         ease: "power2.inOut",
         onComplete: () => {
-          setPrevIndex(currentIndex);
+          prevIndexRef.current = currentIndex;
           if (materialRef.current) {
             materialRef.current.uniforms.uProgress.value = 0;
           }
+          updateMaterialUniforms();
         },
       });
     }
-  }, [currentIndex, prevIndex]);
+  }, [currentIndex]);
 
-  useEffect(() => {
+  const updateMaterialUniforms = () => {
     if (materialRef.current && planeRef.current) {
-      const texture1 = textures[prevIndex];
+      const texture1 = textures[prevIndexRef.current];
       const texture2 = textures[currentIndex];
       materialRef.current.uniforms.uTexture1.value = texture1;
       materialRef.current.uniforms.uTexture2.value = texture2;
@@ -128,18 +141,23 @@ function Slideshow({ projects, currentIndex }: SlideshowProps) {
         texture2.image.height
       );
     }
-  }, [prevIndex, currentIndex, textures]);
+  };
+
+  useEffect(() => {
+    updateMaterialUniforms();
+  }, [currentIndex, prevIndexRef.current]);
 
   return (
     <Plane args={[2, 1]} ref={planeRef}>
       {/* @ts-ignore */}
       <displacementShaderMaterial
         ref={materialRef}
-        uTexture1={textures[prevIndex]}
+        uTexture1={textures[prevIndexRef.current]}
         uTexture2={textures[currentIndex]}
         uDisplacement={displacementTexture}
         uProgress={0}
         transparent
+        side={DoubleSide}
       />
     </Plane>
   );

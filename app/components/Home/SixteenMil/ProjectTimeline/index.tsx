@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -17,18 +17,16 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
   currentIndex,
   onProjectChange,
 }) => {
+  const [animatingIndex, setAnimatingIndex] = useState(currentIndex);
   const timelineRef = useRef<HTMLDivElement>(null);
   const redLineRef = useRef<HTMLDivElement>(null);
   const projectInfoRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
   const projectItemsRef = useRef<(HTMLDivElement | null)[]>([]);
 
-  const setProjectItemRef = useCallback(
-    (el: HTMLDivElement | null, index: number) => {
-      projectItemsRef.current[index] = el;
-    },
-    []
-  );
+  const setProjectItemRef = (el: HTMLDivElement | null, index: number) => {
+    projectItemsRef.current[index] = el;
+  };
 
   useEffect(() => {
     if (redLineRef.current && timelineRef.current && projectInfoRef.current) {
@@ -66,12 +64,10 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
           onUpdate: () => {
             const progress = tlRef.current?.progress() || 0;
             const newIndex = Math.floor(progress * projects.length);
-            if (newIndex !== currentIndex) {
-              onProjectChange(newIndex);
-            }
+            setAnimatingIndex(newIndex);
           },
           onComplete: () => {
-            onProjectChange(0);
+            setAnimatingIndex(0);
           },
         });
     }
@@ -79,31 +75,27 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
     return () => {
       tlRef.current?.kill();
     };
-  }, []);
+  }, [projects]);
 
   useEffect(() => {
-    if (projectInfoRef.current) {
-      gsap.fromTo(
-        projectInfoRef.current,
-        { opacity: 0, y: 50 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          ease: "power2.inOut",
-        }
-      );
+    if (animatingIndex !== currentIndex) {
+      console.log({
+        hit: "hit",
+        newIndex: animatingIndex,
+        currentIndex,
+      });
+      onProjectChange(animatingIndex);
     }
-  }, [currentIndex]);
+  }, [animatingIndex, currentIndex, onProjectChange]);
 
   return (
     <div className={styles.HTMLwrap}>
       <div className={styles.projectTimeline}>
         <div className={styles.projectInfo} ref={projectInfoRef}>
-          <h2>{projects[currentIndex].title}</h2>
-          <p>{projects[currentIndex].type}</p>
+          <h2>{projects[animatingIndex].title}</h2>
+          <p>{projects[animatingIndex].type}</p>
           <Link
-            href={`/projects/${projects[currentIndex].slug?.current}`}
+            href={`/projects/${projects[animatingIndex].slug?.current}`}
             className={styles.button}
           >
             View Project
