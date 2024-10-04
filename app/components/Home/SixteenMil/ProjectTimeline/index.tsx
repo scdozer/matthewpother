@@ -6,6 +6,14 @@ import { gsap } from "gsap";
 import { Projects } from "@/sanity/utils/graphql";
 import styles from "./styles.module.scss";
 
+const TYPES_MAP = {
+  Docs: "Documentaries",
+  narrative: "Narratives",
+  musicVideo: "Music Videos",
+  commercial: "Commercial",
+  stills: "Stills",
+};
+
 interface ProjectTimelineProps {
   projects: Projects[];
   currentIndex: number;
@@ -78,12 +86,22 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
   }, [projects]);
 
   useEffect(() => {
+    if (projectInfoRef.current) {
+      gsap.fromTo(
+        projectInfoRef.current,
+        { opacity: 0, y: 50 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          ease: "power2.out",
+        }
+      );
+    }
+  }, [currentIndex]);
+
+  useEffect(() => {
     if (animatingIndex !== currentIndex) {
-      console.log({
-        hit: "hit",
-        newIndex: animatingIndex,
-        currentIndex,
-      });
       onProjectChange(animatingIndex);
     }
   }, [animatingIndex, currentIndex, onProjectChange]);
@@ -93,7 +111,9 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
       <div className={styles.projectTimeline}>
         <div className={styles.projectInfo} ref={projectInfoRef}>
           <h2>{projects[animatingIndex].title}</h2>
-          <p>{projects[animatingIndex].type}</p>
+          <p>
+            {TYPES_MAP[projects[animatingIndex].type as keyof typeof TYPES_MAP]}
+          </p>
           <Link
             href={`/projects/${projects[animatingIndex].slug?.current}`}
             className={styles.button}

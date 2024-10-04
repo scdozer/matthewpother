@@ -25,10 +25,18 @@
   transform: translateY(50px);
   padding: 10px;
   overflow: hidden;
-  height: 100px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 
   @media (max-width: 768px) {
     height: aut0;
+  }
+
+  a {
+    margin-top: 5px;
+    font-size: 1.2rem;
   }
 }
 

@@ -12,6 +12,7 @@ const TYPES_MAP = {
   commercial: "Commercial",
   stills: "Stills",
 };
+
 interface GridViewProps {
   projects: Projects[];
   isTransitioning: boolean;
