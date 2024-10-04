@@ -120,18 +120,8 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
           <div className="canvas-container">
             <Canvas>
               <PerspectiveCamera makeDefault position={[0, 0, 5]} />
-              <ambientLight intensity={0.5} />
-              <pointLight position={[10, 10, 10]} intensity={0.8} />
               <Suspense fallback={null}>
                 <ResponsiveGroup>
-                  {/* <FilmFrame position={[0, 0, -0.05]} />
-                  <GrainOverlay position={[0, 0, -0.05]} />
-                  <Slideshow
-                    projects={featuredProjects}
-                    currentIndex={currentIndex}
-                  />
-                  <GrainOverlay />
-                  <FilmFrame /> */}
                   <LayeredCard
                     projects={featuredProjects}
                     currentIndex={currentIndex}
