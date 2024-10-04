@@ -5,6 +5,13 @@ import { Projects } from "@/sanity/utils/graphql";
 import { gsap } from "gsap";
 import styles from "./styles.module.scss";
 
+const TYPES_MAP = {
+  Docs: "Documentaries",
+  narrative: "Narratives",
+  musicVideo: "Music Videos",
+  commercial: "Commercial",
+  stills: "Stills",
+};
 interface GridViewProps {
   projects: Projects[];
   isTransitioning: boolean;
@@ -100,7 +107,9 @@ const GridView: React.FC<GridViewProps> = ({
     <div ref={gridRef} className={styles.gridElement}>
       {Object.entries(projectsByType).map(([type, typeProjects]) => (
         <div key={type} className={styles.gridSection}>
-          <h2 className={styles.gridSectionTitle}>{type}</h2>
+          <h2 className={styles.gridSectionTitle}>
+            {TYPES_MAP[type as keyof typeof TYPES_MAP]}
+          </h2>
           <div className={styles.gridProjects}>
             {typeProjects.map((project) => (
               <Link
