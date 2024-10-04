@@ -30,12 +30,6 @@
   }
 }
 
-@media (max-width: 480px) {
-  .gridProjects {
-    grid-template-columns: 1fr;
-  }
-}
-
 .gridProject {
   text-align: left;
   text-decoration: none;
