@@ -1,4 +1,4 @@
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import {
   useVideoTexture,
@@ -53,82 +53,31 @@ interface GrainOverlayProps {
 }
 
 function GrainOverlay({ position = [0, 0, 0.1] }: GrainOverlayProps) {
-  const grainVideoRef = useRef<HTMLVideoElement>(null);
-  const lightVideoRef = useRef<HTMLVideoElement>(null);
-
   const grainTexture = useVideoTexture("/film/film-grain.mp4", {
     loop: true,
     muted: true,
     crossOrigin: "anonymous",
-    start: false,
+    autoplay: true,
+    playsInline: true,
   });
 
   const lightTexture = useVideoTexture("/film/light-overlay.mp4", {
     loop: true,
     muted: true,
     crossOrigin: "anonymous",
-    start: false,
+    autoplay: true,
+    playsInline: true,
   });
 
   const filmTexture = useTexture("/film/super8.png");
 
   const materialRef = useRef<ShaderMaterial>(null);
 
-  useEffect(() => {
+  useFrame(() => {
     const grainVideo = (grainTexture as VideoTexture).source.data;
     const lightVideo = (lightTexture as VideoTexture).source.data;
-
-    if (grainVideoRef.current) {
-      grainVideoRef.current.src = grainVideo.src;
-    }
-    if (lightVideoRef.current) {
-      lightVideoRef.current.src = lightVideo.src;
-    }
-
     grainVideo.playbackRate = 0.25;
     lightVideo.playbackRate = 0.25;
-
-    const playVideos = () => {
-      grainVideo
-        .play()
-        .catch((error: any) =>
-          console.error("Error playing grain video:", error)
-        );
-      lightVideo
-        .play()
-        .catch((error: any) =>
-          console.error("Error playing light video:", error)
-        );
-    };
-
-    playVideos();
-
-    const handleUserInteraction = () => {
-      playVideos();
-      window.removeEventListener("click", handleUserInteraction);
-      window.removeEventListener("touchstart", handleUserInteraction);
-    };
-
-    window.addEventListener("click", handleUserInteraction);
-    window.addEventListener("touchstart", handleUserInteraction);
-
-    return () => {
-      window.removeEventListener("click", handleUserInteraction);
-      window.removeEventListener("touchstart", handleUserInteraction);
-    };
-  }, [grainTexture, lightTexture]);
-
-  useFrame(() => {
-    if (grainVideoRef.current && grainVideoRef.current.paused) {
-      grainVideoRef.current
-        .play()
-        .catch((error) => console.error("Error playing grain video:", error));
-    }
-    if (lightVideoRef.current && lightVideoRef.current.paused) {
-      lightVideoRef.current
-        .play()
-        .catch((error) => console.error("Error playing light video:", error));
-    }
   });
 
   const materialProps = useMemo(
