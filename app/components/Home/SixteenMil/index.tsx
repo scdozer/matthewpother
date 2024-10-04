@@ -41,9 +41,9 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
   useFrame((state) => {
     if (groupRef.current) {
       groupRef.current.rotation.y =
-        Math.sin(state.clock.elapsedTime * 0.2) * 0.25;
+        Math.sin(state.clock.elapsedTime * 0.3) * 0.25;
       groupRef.current.rotation.x =
-        Math.cos(state.clock.elapsedTime * 0.2) * 0.25;
+        Math.cos(state.clock.elapsedTime * 0.3) * 0.25;
     }
   });
 

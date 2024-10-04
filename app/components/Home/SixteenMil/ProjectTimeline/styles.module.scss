@@ -26,6 +26,10 @@
   padding: 10px;
   overflow: hidden;
   height: 100px;
+
+  @media (max-width: 768px) {
+    height: aut0;
+  }
 }
 
 .timelineSection {
@@ -35,6 +39,11 @@
   padding: 20px 0;
   margin-bottom: 20px;
   position: relative;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0px;
+    padding: 10px 0px;
+  }
 
   .timelineItem {
     flex: 1;
