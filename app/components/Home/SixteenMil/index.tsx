@@ -1,10 +1,4 @@
-import {
-  Canvas,
-  useThree,
-  useFrame,
-  AmbientLight,
-  PointLight,
-} from "@react-three/fiber";
+import { Canvas, useThree, useFrame } from "@react-three/fiber";
 import {
   Suspense,
   useMemo,
@@ -77,13 +71,8 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
   );
 
   const handleProjectChange = useCallback((index: number) => {
-    console.log(`handleProjectChange called with index: ${index}`);
     setCurrentIndex(index);
   }, []);
-
-  useEffect(() => {
-    console.log(`currentIndex updated to: ${currentIndex}`);
-  }, [currentIndex]);
 
   const handleViewChange = () => {
     setIsTransitioning(true);
