@@ -36,46 +36,27 @@ export default function Project({ project }: { project: Projects }) {
       const images = gsap.utils.toArray(imagesRef.current.children);
 
       images.forEach((image: any, index: number) => {
-        // Set random width between 50% and 90%
-        const randomWidth = gsap.utils.random(50, 90);
-        const randomSpeed = gsap.utils.random(0.5, 2); // Random speed multiplier
-        const randomStart = gsap.utils.random(-50, 50); // Random starting position
-
         gsap.set(image, {
-          width: `${randomWidth}%`,
           clipPath: "inset(100% 0% 0% 0%)",
-          xPercent: () => gsap.utils.random(-10, 10), // Random horizontal offset
-          yPercent: randomStart,
         });
 
         ScrollTrigger.create({
           trigger: image,
-          start: "top bottom",
+          start: "top 50%",
           end: "bottom top",
           onEnter: () => {
             gsap.to(image, {
               clipPath: "inset(0% 0% 0% 0%)",
               duration: 0.5,
-              ease: "power4.out",
+              ease: "power2.out",
             });
           },
           onLeaveBack: () => {
             gsap.to(image, {
               clipPath: "inset(100% 0% 0% 0%)",
-              duration: 0.2,
-              ease: "power4.in",
+              duration: 0.3,
+              ease: "power2.in",
             });
-          },
-        });
-
-        gsap.to(image, {
-          yPercent: randomStart - 100 * randomSpeed, // Move relative to start position
-          ease: "none",
-          scrollTrigger: {
-            trigger: imagesRef.current,
-            start: "top bottom",
-            end: "bottom top",
-            scrub: true,
           },
         });
       });
