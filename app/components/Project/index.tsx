@@ -7,6 +7,7 @@ import Image from "next/image";
 import { PortableText } from "@portabletext/react";
 import { Projects } from "@/sanity/utils/graphql";
 import styles from "./style.module.scss";
+import { SanityImageAsset, SanityFileAsset } from "@/sanity/utils/graphql";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -85,6 +86,14 @@ export default function Project({ project }: { project: Projects }) {
     };
   }, []);
 
+  const isImageAsset = (item: any): item is { asset: SanityImageAsset } => {
+    return item.asset && item.asset._type === "sanity.imageAsset";
+  };
+
+  const isFileAsset = (item: any): item is { asset: SanityFileAsset } => {
+    return item.asset && item.asset._type === "sanity.fileAsset";
+  };
+
   return (
     <div ref={containerRef} className={styles.container}>
       <div className={styles.content}>
@@ -97,15 +106,22 @@ export default function Project({ project }: { project: Projects }) {
       </div>
 
       <div ref={imagesRef} className={styles.imageGrid}>
-        {project.gallery?.map((image, index) => (
-          <div key={index} className={styles.imageContainer}>
-            <Image
-              src={image?.asset?.url || ""}
-              alt={`Project image ${index}`}
-              width={image?.asset?.metadata?.dimensions?.width || 1000}
-              height={image?.asset?.metadata?.dimensions?.height || 1000}
-              style={{ width: "100%", height: "auto" }}
-            />
+        {project.gallery?.map((item, index) => (
+          <div key={index}>
+            {isImageAsset(item) && (
+              <Image
+                src={item?.asset?.url || ""}
+                alt={`Project image ${index}`}
+                width={item?.asset?.metadata?.dimensions?.width || 1000}
+                height={item?.asset?.metadata?.dimensions?.height || 1000}
+                style={{ width: "100%", height: "auto" }}
+              />
+            )}
+            {isFileAsset(item) && (
+              <a href={item?.asset?.url || ""} download>
+                {item.asset.originalFilename}
+              </a>
+            )}
           </div>
         ))}
       </div>
