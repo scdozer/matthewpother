@@ -30,13 +30,21 @@
   flex-direction: column;
   gap: 8px;
 
-  @media (max-width: 768px) {
-    height: aut0;
-  }
-
   a {
     margin-top: 5px;
     font-size: 1.2rem;
+  }
+
+  @media (max-width: 768px) {
+    height: aut0;
+    gap: 5px;
+    h2 {
+      font-size: 1.2rem;
+    }
+    a {
+      margin-top: 2px;
+      font-size: 0.8rem;
+    }
   }
 }
 
