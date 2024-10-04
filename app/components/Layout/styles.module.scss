@@ -18,13 +18,18 @@
   padding: 1rem;
 
   @media (max-width: 768px) {
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: column;
   }
 
   h1,
   div {
     opacity: 0;
     transform: translateY(-40px);
+
+    @media (max-width: 768px) {
+      transform: translateY(40px);
+    }
   }
   div {
     display: flex;
@@ -34,7 +39,8 @@
     gap: 20px;
 
     @media (max-width: 768px) {
-      flex-direction: column;
+      flex-direction: column-reverse;
+      gap: 8px;
     }
   }
   h1 {
