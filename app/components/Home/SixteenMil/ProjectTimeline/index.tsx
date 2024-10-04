@@ -18,12 +18,14 @@ interface ProjectTimelineProps {
   projects: Projects[];
   currentIndex: number;
   onProjectChange: (index: number) => void;
+  onProjectNavigation: (slug: string) => void;
 }
 
 const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
   projects,
   currentIndex,
   onProjectChange,
+  onProjectNavigation,
 }) => {
   const [animatingIndex, setAnimatingIndex] = useState(currentIndex);
   const timelineRef = useRef<HTMLDivElement>(null);
@@ -47,21 +49,26 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
         y: 0,
         stagger: 0.2,
         duration: 0.5,
-        ease: "power2.out",
+        ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
       });
 
       initialTl.to(
         redLineRef.current,
-        { height: "100%", duration: 0.5, ease: "power2.inOut" },
+        {
+          height: "100%",
+          duration: 0.5,
+          ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+        },
         "-=0.3"
       );
 
-      initialTl.to(projectInfoRef.current, {
-        opacity: 1,
-        y: 0,
-        duration: 0.5,
-        ease: "power2.out",
-      });
+      //   initialTl.to(projectInfoRef.current, {
+      //     opacity: 1,
+      //     y: 0,
+      //     duration: 0.5,
+      //     ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+      //     delay: 5,
+      //   });
 
       tlRef.current = gsap
         .timeline({ repeat: -1, delay: 1 })
@@ -88,13 +95,15 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
   useEffect(() => {
     if (projectInfoRef.current) {
       gsap.fromTo(
-        projectInfoRef.current,
+        projectInfoRef.current.children,
         { opacity: 0, y: 50 },
         {
           opacity: 1,
           y: 0,
           duration: 0.5,
-          ease: "power2.out",
+          ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+          delay: 0.2,
+          stagger: 0.2,
         }
       );
     }
@@ -110,16 +119,18 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
     <div className={styles.HTMLwrap}>
       <div className={styles.projectTimeline}>
         <div className={styles.projectInfo} ref={projectInfoRef}>
-          <h2>{projects[animatingIndex].title}</h2>
           <p>
             {TYPES_MAP[projects[animatingIndex].type as keyof typeof TYPES_MAP]}
           </p>
-          <Link
-            href={`/projects/${projects[animatingIndex].slug?.current}`}
+          <h2>{projects[animatingIndex].title}</h2>
+          <button
             className={styles.button}
+            onClick={() =>
+              onProjectNavigation(projects[animatingIndex].slug?.current || "")
+            }
           >
             View Project
-          </Link>
+          </button>
         </div>
         <div className={styles.timelineSection} ref={timelineRef}>
           {projects.map((project, index) => (

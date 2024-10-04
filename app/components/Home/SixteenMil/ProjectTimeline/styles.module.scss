@@ -21,8 +21,6 @@
 }
 
 .projectInfo {
-  opacity: 0;
-  transform: translateY(50px);
   padding: 10px;
   overflow: hidden;
   height: 120px;
@@ -30,9 +28,21 @@
   flex-direction: column;
   gap: 8px;
 
-  a {
+  * {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+
+  button {
     margin-top: 5px;
-    font-size: 1.2rem;
+    font-size: 0.7rem;
+    text-align: left;
+    background: black;
+    border: none;
+    cursor: pointer;
+  }
+  p {
+    font-size: 0.7rem;
   }
 
   @media (max-width: 768px) {
@@ -41,9 +51,9 @@
     h2 {
       font-size: 1.2rem;
     }
-    a {
+    button {
       margin-top: 2px;
-      font-size: 0.8rem;
+      font-size: 0.6rem;
     }
   }
 }

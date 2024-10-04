@@ -17,6 +17,7 @@ import ProjectTimeline from "./ProjectTimeline";
 import GridView from "../GridView";
 import { gsap } from "gsap";
 import styles from "./styles.module.scss";
+import { useRouter } from "next/navigation";
 
 interface SixteenMilProps {
   projects: Projects[];
@@ -62,9 +63,11 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
 }
 
 export default function SixteenMil({ projects }: SixteenMilProps) {
+  const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentView, setCurrentView] = useState<"3d" | "grid">("3d");
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const featuredProjects = useMemo(
     () => projects.filter((project) => project.featured),
     [projects]
@@ -90,24 +93,15 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
     return tl;
   };
 
-  const animate3DIn = () => {
-    const tl = gsap.timeline();
-    tl.fromTo(
-      ".canvas-container",
-      { opacity: 0 },
-      { opacity: 1, duration: 0.5 }
-    );
-    tl.fromTo(
-      ".project-timeline",
-      { opacity: 0, y: 50 },
-      { opacity: 1, y: 0, duration: 0.5 },
-      "-=0.3"
-    );
-    return tl;
+  const handleProjectNavigation = (slug: string) => {
+    setIsNavigating(true);
+    animate3DOut().then(() => {
+      router.push(`/projects/${slug}`);
+    });
   };
 
   useEffect(() => {
-    if (isTransitioning) {
+    if (isTransitioning && !isNavigating) {
       if (currentView === "3d") {
         animate3DOut().then(() => handleTransitionComplete("grid"));
       } else {
@@ -116,7 +110,7 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
         }, 1000);
       }
     }
-  }, [isTransitioning, currentView]);
+  }, [isTransitioning, currentView, isNavigating]);
 
   return (
     <div className={styles.container}>
@@ -147,20 +141,23 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
               projects={featuredProjects}
               currentIndex={currentIndex}
               onProjectChange={handleProjectChange}
+              onProjectNavigation={handleProjectNavigation}
             />
           </div>
         </>
       )}
-      {currentView === "grid" && (
+      {currentView === "grid" && !isNavigating && (
         <GridView
           projects={projects}
           isTransitioning={isTransitioning}
           onTransitionComplete={() => handleTransitionComplete("3d")}
         />
       )}
-      <button className={styles.viewToggle} onClick={handleViewChange}>
-        {currentView === "3d" ? "All Projects" : "View Selects"}
-      </button>
+      {!isNavigating && (
+        <button className={styles.viewToggle} onClick={handleViewChange}>
+          {currentView === "3d" ? "All Projects" : "View Selects"}
+        </button>
+      )}
     </div>
   );
 }
