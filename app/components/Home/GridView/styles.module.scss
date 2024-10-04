@@ -28,6 +28,10 @@
   .gridProjects {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  .gridElement {
+    padding: 4rem 2rem;
+  }
 }
 
 .gridProject {
