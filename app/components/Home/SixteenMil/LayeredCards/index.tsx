@@ -190,11 +190,10 @@ const LayeredCard: React.FC<LayeredCardProps> = ({
     });
   }, [currentIndex]);
 
-  // Animate uAlpha for each plane
   useEffect(() => {
     if (!initialized) return;
 
-    const duration = 5;
+    const duration = 1;
     materialsRef.current.forEach((material, i) => {
       gsap.to(material.uniforms.uAlpha, {
         ease: "none",
@@ -205,7 +204,7 @@ const LayeredCard: React.FC<LayeredCardProps> = ({
         },
         duration: 5,
         repeat: -1,
-        delay: i * (duration / planeCount),
+        delay: i * (duration / (planeCount * 2)),
         onUpdate: () => {
           material.uniformsNeedUpdate = true;
         },
@@ -236,18 +235,7 @@ const LayeredCard: React.FC<LayeredCardProps> = ({
             if (el) planeRefs.current[i] = el;
           }}
         >
-          <planeGeometry
-            args={[1.6, 0.9]}
-            ref={(geometry) => {
-              if (geometry) {
-                const uvs = geometry.attributes.uv.array;
-                for (let j = 0; j < uvs.length; j += 4) {
-                  [uvs[j], uvs[j + 2]] = [uvs[j + 2], uvs[j]];
-                }
-                geometry.attributes.uv.needsUpdate = true;
-              }
-            }}
-          />
+          <planeGeometry args={[1.6, 0.9]} />
           <layeredMaterial
             ref={(material) => {
               if (material) {
