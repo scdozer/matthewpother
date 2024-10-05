@@ -8,9 +8,6 @@ import {
   useCallback,
 } from "react";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
-import Slideshow from "./Slideshow";
-import GrainOverlay from "./Grain";
-import FilmFrame from "./FilmFrame";
 import { Projects } from "@/sanity/utils/graphql";
 import * as THREE from "three";
 import ProjectTimeline from "./ProjectTimeline";
