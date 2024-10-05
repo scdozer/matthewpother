@@ -46,10 +46,9 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Introduce randomness in rotation
       const time = state.clock.elapsedTime;
-      const randomOffsetX = Math.sin(time * 0.1) * 0.25; // Small random offset for X
-      const randomOffsetY = Math.cos(time * 0.1) * 0.25; // Small random offset for Y
+      const randomOffsetX = Math.sin(time * 0.1) * 0.25;
+      const randomOffsetY = Math.cos(time * 0.1) * 0.25;
 
       groupRef.current.rotation.y =
         Math.sin(time * 0.3 + randomOffsetY) * 0.25 + randomOffsetY;

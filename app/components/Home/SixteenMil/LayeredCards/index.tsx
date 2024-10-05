@@ -175,7 +175,7 @@ const LayeredCard: React.FC<LayeredCardProps> = ({
     // Animate the progress uniform
     gsap.to(transitionProgressRef.current, {
       value: 1,
-      duration: 0.6,
+      duration: 1,
       ease: "power2.inOut",
       onUpdate: () => {
         materialsRef.current.forEach((material) => {
