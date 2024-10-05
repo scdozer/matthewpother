@@ -236,7 +236,18 @@ const LayeredCard: React.FC<LayeredCardProps> = ({
             if (el) planeRefs.current[i] = el;
           }}
         >
-          <planeGeometry args={[1.6, 0.9]} />
+          <planeGeometry
+            args={[1.6, 0.9]}
+            ref={(geometry) => {
+              if (geometry) {
+                const uvs = geometry.attributes.uv.array;
+                for (let j = 0; j < uvs.length; j += 4) {
+                  [uvs[j], uvs[j + 2]] = [uvs[j + 2], uvs[j]];
+                }
+                geometry.attributes.uv.needsUpdate = true;
+              }
+            }}
+          />
           <layeredMaterial
             ref={(material) => {
               if (material) {
