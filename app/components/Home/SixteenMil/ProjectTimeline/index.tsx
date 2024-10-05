@@ -71,7 +71,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
       //   });
 
       tlRef.current = gsap
-        .timeline({ repeat: -1, delay: 1 })
+        .timeline({ repeat: -1, delay: 2.5 })
         .to(redLineRef.current, {
           left: "100%",
           duration: duration * projects.length,
