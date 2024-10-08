@@ -1,9 +1,13 @@
-import React, { useRef, useLayoutEffect, useCallback } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Projects } from "@/sanity/utils/graphql";
 import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/dist/ScrollTrigger";
 import styles from "./styles.module.scss";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const TYPES_MAP = {
   Docs: "Documentaries",
@@ -25,72 +29,87 @@ const GridView: React.FC<GridViewProps> = ({
   onTransitionComplete,
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const animateIn = useCallback(() => {
-    const tl = gsap.timeline();
-    gsap.set(`.${styles.gridSectionTitle}, .${styles.gridProject}`, {
-      opacity: 0,
-      y: 20,
-    });
-
-    tl.fromTo(
-      `.${styles.gridSectionTitle}`,
-      { opacity: 0, y: 20 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.2,
-        duration: 0.5,
-        ease: "power2.out",
-      }
-    );
-
-    tl.fromTo(
-      `.${styles.gridProject}`,
-      { opacity: 0, y: 20 },
-      {
-        opacity: 1,
-        y: 0,
-        stagger: 0.05,
-        duration: 0.5,
-        ease: "power2.out",
-      },
-      "-=0.75"
-    );
-
-    return tl;
-  }, []);
-
-  const animateOut = useCallback(() => {
-    const tl = gsap.timeline();
-
-    tl.to(`.${styles.gridSectionTitle}, .${styles.gridProject}`, {
-      opacity: 0,
-      y: 20,
-      stagger: 0.05,
-      duration: 0.5,
-      ease: "power2.in",
-    });
-
-    tl.to(gridRef.current, { opacity: 0, duration: 0.5 });
-
-    tl.add(() => onTransitionComplete("scroll"));
-
-    return tl;
-  }, [onTransitionComplete]);
-
-  useLayoutEffect(() => {
-    if (!isTransitioning) {
-      gsap.set(gridRef.current, { opacity: 1 });
-      gsap.set(`.${styles.gridSectionTitle}, .${styles.gridProject}`, {
+  useEffect(() => {
+    if (isTransitioning) {
+      // Handle transition out
+      gsap.to(gridRef.current, {
         opacity: 0,
         y: 20,
+        duration: 0.5,
+        onComplete: () => onTransitionComplete("scroll"),
       });
-      animateIn();
-    } else {
-      animateOut();
+      return;
     }
-  }, [isTransitioning, animateIn, animateOut]);
+
+    // Animate in
+    const sections = gsap.utils.toArray<HTMLElement>(".gridSection");
+    sections.forEach((section) => {
+      const title = section.querySelector(".gridSectionTitle");
+      const projects = gsap.utils.toArray<HTMLElement>(
+        section.querySelectorAll(".gridProject")
+      );
+
+      gsap.set([title, ...projects], { opacity: 0, y: 20 });
+
+      ScrollTrigger.create({
+        trigger: section,
+        start: "top 80%",
+        onEnter: () => {
+          gsap.to(title, { opacity: 1, y: 0, duration: 0.5 });
+          gsap.to(projects, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
+        },
+        onEnterBack: () => {
+          gsap.to(title, { opacity: 1, y: 0, duration: 0.5 });
+          gsap.to(projects, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
+        },
+        onLeave: () => {
+          gsap.to([title, ...projects], { opacity: 0, y: 20, duration: 0.5 });
+        },
+        onLeaveBack: () => {
+          gsap.to([title, ...projects], { opacity: 0, y: 20, duration: 0.5 });
+        },
+      });
+    });
+
+    // Animate elements that are initially in view
+    gsap.utils.toArray<HTMLElement>(".gridSection").forEach((section) => {
+      if (ScrollTrigger.isInViewport(section)) {
+        const title = section.querySelector(".gridSectionTitle");
+        const projects = gsap.utils.toArray<HTMLElement>(
+          section.querySelectorAll(".gridProject")
+        );
+        gsap.to(title, { opacity: 1, y: 0, duration: 0.5 });
+        gsap.to(projects, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
+      }
+    });
+
+    return () => {
+      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+    };
+  }, [isTransitioning, onTransitionComplete]);
+
+  const handleProjectClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    e.preventDefault();
+    if (isNavigating) return;
+
+    setIsNavigating(true);
+
+    gsap.to(gridRef.current, {
+      opacity: 0,
+      y: 20,
+      duration: 0.5,
+      onComplete: () => {
+        setIsNavigating(false);
+        router.push(href);
+      },
+    });
+  };
 
   const projectsByType = projects.reduce<Record<string, Projects[]>>(
     (acc, project) => {
@@ -106,32 +125,37 @@ const GridView: React.FC<GridViewProps> = ({
 
   return (
     <div ref={gridRef} className={styles.gridElement}>
-      {Object.entries(projectsByType).map(([type, typeProjects]) => (
-        <div key={type} className={styles.gridSection}>
-          <h2 className={styles.gridSectionTitle}>
-            {TYPES_MAP[type as keyof typeof TYPES_MAP]}
-          </h2>
-          <div className={styles.gridProjects}>
-            {typeProjects.map((project) => (
-              <Link
-                href={`/projects/${project.slug?.current}`}
-                key={project.title}
-                className={styles.gridProject}
-              >
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={project?.image?.asset?.url || ""}
-                    alt={project?.title || ""}
-                    layout="fill"
-                    objectFit="cover"
-                  />
-                </div>
-                <p className={styles.gridProjectTitle}>{project.title}</p>
-              </Link>
-            ))}
+      {Object.entries(projectsByType).map(
+        ([type, typeProjects], sectionIndex) => (
+          <div key={type} className={`${styles.gridSection} gridSection`}>
+            <h2 className={`${styles.gridSectionTitle} gridSectionTitle`}>
+              {TYPES_MAP[type as keyof typeof TYPES_MAP]}
+            </h2>
+            <div className={styles.gridProjects}>
+              {typeProjects.map((project) => (
+                <Link
+                  href={`/projects/${project.slug?.current}`}
+                  key={project.title}
+                  className={`${styles.gridProject} gridProject`}
+                  onClick={(e) =>
+                    handleProjectClick(e, `/projects/${project.slug?.current}`)
+                  }
+                >
+                  <div className={styles.imageWrapper}>
+                    <Image
+                      src={project?.image?.asset?.url || ""}
+                      alt={project?.title || ""}
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                  <p className={styles.gridProjectTitle}>{project.title}</p>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        )
+      )}
     </div>
   );
 };

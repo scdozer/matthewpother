@@ -7,48 +7,52 @@ import styles from "./style.module.scss";
 
 gsap.registerPlugin(ScrollTrigger);
 
-interface ClientSideGalleryProps {
+interface ProjectGalleryProps {
   gallery: any[];
+  videoEmbed?: string;
 }
 
-const ClientSideGallery = ({ gallery }: ClientSideGalleryProps) => {
-  const imagesRef = useRef<HTMLDivElement>(null);
+const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
+  const galleryRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (imagesRef.current) {
-      const images = gsap.utils.toArray(imagesRef.current.children);
+    if (galleryRef.current) {
+      const images = gsap.utils.toArray(
+        galleryRef.current.querySelectorAll(`.${styles.galleryItem}`)
+      );
 
-      images.forEach((image: any) => {
-        gsap.set(image, {
-          clipPath: "inset(100% 0% 0% 0%)",
-        });
+      images.forEach((image: any, index: number) => {
+        const isEven = index % 2 === 0;
+        const startPosition = isEven ? "20%" : "-20%";
 
-        ScrollTrigger.create({
-          trigger: image,
-          start: "top bottom",
-          end: "top 50%",
-          onEnter: () => {
-            gsap.to(image, {
-              clipPath: "inset(0% 0% 0% 0%)",
-              duration: 0.5,
-              ease: "power2.out",
-            });
+        gsap.fromTo(
+          image,
+          {
+            y: startPosition,
+            opacity: 0,
+            scale: 0.8,
           },
-          onLeaveBack: () => {
-            gsap.to(image, {
-              clipPath: "inset(100% 0% 0% 0%)",
-              duration: 0.3,
-              ease: "power2.in",
-            });
-          },
-        });
+          {
+            y: "0%",
+            opacity: 1,
+            scale: 1,
+            duration: 1,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: image,
+              start: "top bottom-=100",
+              end: "bottom top+=100",
+              scrub: 1,
+            },
+          }
+        );
       });
     }
 
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [gallery]);
 
   const isImageAsset = (item: any): item is { asset: SanityImageAsset } => {
     return item.asset && item.asset._type === "sanity.imageAsset";
@@ -59,20 +63,46 @@ const ClientSideGallery = ({ gallery }: ClientSideGalleryProps) => {
   };
 
   return (
-    <div ref={imagesRef} className={styles.imageGrid}>
+    <div ref={galleryRef} className={styles.galleryContainer}>
+      {videoEmbed && (
+        <div className={`${styles.galleryItem} ${styles.videoItem}`}>
+          <video
+            src={videoEmbed}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className={styles.video}
+          />
+        </div>
+      )}
       {gallery?.map((item, index) => (
-        <div key={index}>
+        <div
+          key={index}
+          className={`${styles.galleryItem} ${
+            index % 3 === 0
+              ? styles.large
+              : index % 3 === 1
+                ? styles.medium
+                : styles.small
+          }`}
+        >
           {isImageAsset(item) && (
             <Image
               src={item?.asset?.url || ""}
-              alt={`Project image`}
+              alt={`Project image ${index + 1}`}
               width={item?.asset?.metadata?.dimensions?.width || 1000}
               height={item?.asset?.metadata?.dimensions?.height || 1000}
-              style={{ width: "100%", height: "auto" }}
+              layout="responsive"
+              objectFit="cover"
             />
           )}
           {isFileAsset(item) && (
-            <a href={item?.asset?.url || ""} download>
+            <a
+              href={item?.asset?.url || ""}
+              download
+              className={styles.fileDownload}
+            >
               {item.asset.originalFilename}
             </a>
           )}
@@ -82,4 +112,4 @@ const ClientSideGallery = ({ gallery }: ClientSideGalleryProps) => {
   );
 };
 
-export default ClientSideGallery;
+export default ProjectGallery;
