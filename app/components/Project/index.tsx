@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useRef } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
 import { PortableText } from "@portabletext/react";
@@ -49,7 +48,7 @@ export default function Project({ project }: { project: Projects }) {
 
       <ProjectGallery
         gallery={project.gallery}
-        videoEmbed={project.videoEmbed}
+        videoEmbed={project?.videoEmbed || ""}
       />
     </div>
   );
