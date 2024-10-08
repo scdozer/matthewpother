@@ -8,8 +8,8 @@ import styles from "./style.module.scss";
 gsap.registerPlugin(ScrollTrigger);
 
 interface ProjectGalleryProps {
-  gallery: any[];
-  videoEmbed?: string;
+  gallery: any;
+  videoEmbed?: any;
 }
 
 const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
