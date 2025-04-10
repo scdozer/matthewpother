@@ -42,7 +42,7 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
             scrollTrigger: {
               trigger: item,
               start: "top bottom-=100",
-              end: "top middle",
+              end: "top 70%",
               scrub: 1,
             },
           }
