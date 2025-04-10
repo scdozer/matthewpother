@@ -22,8 +22,22 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
         galleryRef.current.querySelectorAll(`.${styles.galleryItem}`)
       );
 
-      // Check if we're on mobile
-      const isMobile = window.innerWidth <= 768;
+      // Better mobile detection that works with Safari
+      const isMobile =
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768;
+
+      // Refresh ScrollTrigger on resize
+      ScrollTrigger.addEventListener("refresh", () => {
+        ScrollTrigger.refresh();
+      });
+
+      // Refresh on orientation change
+      window.addEventListener("orientationchange", () => {
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 200);
+      });
 
       items.forEach((item: any, index: number) => {
         const isEven = index % 2 === 0;
@@ -45,11 +59,15 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
             scrollTrigger: {
               trigger: item,
               // Adjust start and end positions for mobile
-              start: isMobile ? "top bottom-=50" : "top bottom-=100",
-              end: isMobile ? "top center" : "top 70%",
+              start: isMobile ? "top bottom-=20%" : "top bottom-=100",
+              end: isMobile ? "top center+=20%" : "top 70%",
               scrub: isMobile ? 0.5 : 1,
               // Add markers for debugging (remove in production)
               // markers: true,
+              // Add toggleActions for better control
+              toggleActions: "play none none reverse",
+              // Add fastScrollEnd for better performance
+              fastScrollEnd: true,
             },
           }
         );
