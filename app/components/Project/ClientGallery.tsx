@@ -118,7 +118,9 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
                 width={item?.asset?.metadata?.dimensions?.width || 1000}
                 height={item?.asset?.metadata?.dimensions?.height || 1000}
                 layout="responsive"
-                objectFit="cover"
+                placeholder="blur"
+                blurDataURL={item?.asset?.metadata?.lqip || ""}
+                quality={90}
               />
             )}
             {isFileAsset(item) && (

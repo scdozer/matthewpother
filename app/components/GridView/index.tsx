@@ -9,6 +9,24 @@ import styles from "./styles.module.scss";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Helper function to generate a tiny placeholder image URL from Sanity image URL
+const getBlurDataURL = (imageUrl: string): string => {
+  if (!imageUrl) return "";
+
+  // For Sanity images, we can use their built-in image transformation API
+  // This creates a tiny, blurred version of the image
+  const url = new URL(imageUrl);
+  const params = new URLSearchParams(url.search);
+
+  // Add parameters for a tiny, blurred image
+  params.set("w", "10"); // Width of 10px
+  params.set("blur", "10"); // Blur effect
+  params.set("q", "10"); // Low quality
+
+  url.search = params.toString();
+  return url.toString();
+};
+
 const TYPES_MAP = {
   Docs: "Documentaries",
   narrative: "Narratives",
@@ -231,7 +249,9 @@ const GridView: React.FC<GridViewProps> = ({
                 src={project?.image?.asset?.url || ""}
                 alt={project?.title || ""}
                 layout="fill"
-                objectFit="cover"
+                placeholder="blur"
+                blurDataURL={project?.image?.asset?.metadata?.lqip || ""}
+                quality={90}
               />
             </div>
           </Link>
@@ -263,7 +283,9 @@ const GridView: React.FC<GridViewProps> = ({
             src={hoveredProject?.image?.asset?.url || ""}
             alt={hoveredProject?.title || ""}
             layout="fill"
-            objectFit="cover"
+            placeholder="blur"
+            blurDataURL={hoveredProject?.image?.asset?.metadata?.lqip || ""}
+            quality={90}
           />
         </div>
       )}
