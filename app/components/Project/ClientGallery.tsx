@@ -22,6 +22,9 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
         galleryRef.current.querySelectorAll(`.${styles.galleryItem}`)
       );
 
+      // Check if we're on mobile
+      const isMobile = window.innerWidth <= 768;
+
       items.forEach((item: any, index: number) => {
         const isEven = index % 2 === 0;
         const startPosition = isEven ? "20%" : "-20%";
@@ -41,9 +44,12 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
             ease: "power2.out",
             scrollTrigger: {
               trigger: item,
-              start: "top bottom-=100",
-              end: "top 70%",
-              scrub: 1,
+              // Adjust start and end positions for mobile
+              start: isMobile ? "top bottom-=50" : "top bottom-=100",
+              end: isMobile ? "top center" : "top 70%",
+              scrub: isMobile ? 0.5 : 1,
+              // Add markers for debugging (remove in production)
+              // markers: true,
             },
           }
         );
