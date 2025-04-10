@@ -26,14 +26,15 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
   const [scale, setScale] = useState(0);
   const groupRef = useRef<THREE.Group>(null);
   const finalScaleRef = useRef(1.5);
-  const initialRotationRef = useRef({ value: 0 });
-  const initialAnimationCompleteRef = useRef(false);
+  const animationStartTimeRef = useRef(0);
+  const initialAnimationDurationRef = useRef(3); // 2s duration + 1s delay
+  const transitionDurationRef = useRef(1); // Duration of the transition between initial rotation and floating
 
   useEffect(() => {
     const newScale = Math.min(viewport.width / 2.25, viewport.height / 2);
     finalScaleRef.current = newScale;
 
-    // Create a timeline for the combined scaling and rotation animation
+    // Create a timeline for the scaling animation
     const tl = gsap.timeline();
 
     // Add the scaling animation
@@ -46,39 +47,66 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
       ease: "power2.out",
     });
 
-    // Add the 360-degree rotation animation
-    tl.to(
-      initialRotationRef.current,
-      {
-        value: Math.PI * 2, // 360 degrees in radians
-        duration: 2,
-        delay: 1,
-        ease: "power2.inOut",
-        onUpdate: () => {
-          if (groupRef.current) {
-            groupRef.current.rotation.y = initialRotationRef.current.value;
-          }
-        },
-        onComplete: () => {
-          initialAnimationCompleteRef.current = true;
-        },
-      },
-      "<"
-    ); // Start at the same time as the scaling animation
+    // Record the time when the animation starts
+    animationStartTimeRef.current = performance.now();
   }, [viewport]);
 
   useFrame((state) => {
     if (groupRef.current) {
-      const time = state.clock.elapsedTime;
-      const randomOffsetX = Math.sin(time * 0.1) * 0.25;
-      const randomOffsetY = Math.cos(time * 0.1) * 0.25;
+      // Calculate elapsed time since the animation started
+      const elapsedTime =
+        (performance.now() - animationStartTimeRef.current) / 1000;
 
-      // Apply the floating animation after the initial rotation is complete
-      if (initialAnimationCompleteRef.current) {
+      // Calculate the rotation based on elapsed time
+      if (elapsedTime < initialAnimationDurationRef.current) {
+        // During the initial animation period (scaling + 360 rotation)
+        const progress = elapsedTime / initialAnimationDurationRef.current;
+
+        // Apply the 360-degree rotation - clean rotation without random offsets
+        groupRef.current.rotation.y = progress * Math.PI * 2;
+        groupRef.current.rotation.x = 0;
+      } else if (
+        elapsedTime <
+        initialAnimationDurationRef.current + transitionDurationRef.current
+      ) {
+        // During the transition period, smoothly interpolate between initial rotation and floating
+        const transitionProgress =
+          (elapsedTime - initialAnimationDurationRef.current) /
+          transitionDurationRef.current;
+
+        // Calculate the target floating values
+        const floatingTime = 0; // Start from the beginning of the floating animation
+        const randomOffsetX = Math.sin(floatingTime * 0.1) * 0.25;
+        const randomOffsetY = Math.cos(floatingTime * 0.1) * 0.25;
+
+        const targetY =
+          Math.PI * 2 +
+          Math.sin(floatingTime * 0.3 + randomOffsetY) * 0.25 +
+          randomOffsetY;
+        const targetX =
+          Math.cos(floatingTime * 0.3 + randomOffsetX) * 0.25 + randomOffsetX;
+
+        // Smoothly interpolate from the final position of the initial rotation to the target floating position
         groupRef.current.rotation.y =
-          Math.sin(time * 0.3 + randomOffsetY) * 0.25 + randomOffsetY;
+          Math.PI * 2 + (targetY - Math.PI * 2) * transitionProgress;
+        groupRef.current.rotation.x = targetX * transitionProgress;
+      } else {
+        // After the transition, apply the floating effect
+        const floatingTime =
+          elapsedTime -
+          (initialAnimationDurationRef.current + transitionDurationRef.current);
+
+        // Calculate the floating animation values
+        const randomOffsetX = Math.sin(floatingTime * 0.1) * 0.25;
+        const randomOffsetY = Math.cos(floatingTime * 0.1) * 0.25;
+
+        // Apply the floating animation
+        groupRef.current.rotation.y =
+          Math.PI * 2 +
+          Math.sin(floatingTime * 0.3 + randomOffsetY) * 0.25 +
+          randomOffsetY;
         groupRef.current.rotation.x =
-          Math.cos(time * 0.3 + randomOffsetX) * 0.25 + randomOffsetX;
+          Math.cos(floatingTime * 0.3 + randomOffsetX) * 0.25 + randomOffsetX;
       }
     }
   });
