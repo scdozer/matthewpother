@@ -41,14 +41,12 @@ export default function Layout({ layout }: { layout: SanityLayout }) {
       opacity: 1,
       y: 0,
       duration: 1,
-      delay: 1,
       ease: "power2.out",
     });
     gsap.to(descriptionRef.current, {
       opacity: 1,
       y: 0,
       duration: 1,
-      delay: 1,
       ease: "power2.out",
     });
   }, []);
