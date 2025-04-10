@@ -31,10 +31,15 @@ const GridView: React.FC<GridViewProps> = ({
   const gridRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
+  const [hoveredProject, setHoveredProject] = useState<Projects | null>(null);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [imageScale, setImageScale] = useState(1);
+  const [imageRotation, setImageRotation] = useState(0);
+  const hoverImageRef = useRef<HTMLDivElement>(null);
+  const lastMousePosition = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     if (isTransitioning) {
-      // Handle transition out
       gsap.to(gridRef.current, {
         opacity: 0,
         y: 20,
@@ -45,44 +50,30 @@ const GridView: React.FC<GridViewProps> = ({
     }
 
     // Animate in
-    const sections = gsap.utils.toArray<HTMLElement>(".gridSection");
-    sections.forEach((section) => {
-      const title = section.querySelector(".gridSectionTitle");
-      const projects = gsap.utils.toArray<HTMLElement>(
-        section.querySelectorAll(".gridProject")
-      );
+    const projects = gsap.utils.toArray<HTMLElement>(".gridProject");
 
-      gsap.set([title, ...projects], { opacity: 0, y: 20 });
+    gsap.set(projects, { opacity: 0, y: 20 });
 
-      ScrollTrigger.create({
-        trigger: section,
-        start: "top 80%",
-        onEnter: () => {
-          gsap.to(title, { opacity: 1, y: 0, duration: 0.5 });
-          gsap.to(projects, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
-        },
-        onEnterBack: () => {
-          gsap.to(title, { opacity: 1, y: 0, duration: 0.5 });
-          gsap.to(projects, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
-        },
-        onLeave: () => {
-          gsap.to([title, ...projects], { opacity: 0, y: 20, duration: 0.5 });
-        },
-        onLeaveBack: () => {
-          gsap.to([title, ...projects], { opacity: 0, y: 20, duration: 0.5 });
-        },
-      });
+    ScrollTrigger.batch(projects, {
+      start: "top 80%",
+      onEnter: (batch) => {
+        gsap.to(batch, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
+      },
+      onLeave: (batch) => {
+        gsap.to(batch, { opacity: 0, y: 20, duration: 0.5 });
+      },
+      onEnterBack: (batch) => {
+        gsap.to(batch, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
+      },
+      onLeaveBack: (batch) => {
+        gsap.to(batch, { opacity: 0, y: 20, duration: 0.5 });
+      },
     });
 
     // Animate elements that are initially in view
-    gsap.utils.toArray<HTMLElement>(".gridSection").forEach((section) => {
-      if (ScrollTrigger.isInViewport(section)) {
-        const title = section.querySelector(".gridSectionTitle");
-        const projects = gsap.utils.toArray<HTMLElement>(
-          section.querySelectorAll(".gridProject")
-        );
-        gsap.to(title, { opacity: 1, y: 0, duration: 0.5 });
-        gsap.to(projects, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
+    gsap.utils.toArray<HTMLElement>(".gridProject").forEach((project) => {
+      if (ScrollTrigger.isInViewport(project)) {
+        gsap.to(project, { opacity: 1, y: 0, duration: 0.5 });
       }
     });
 
@@ -90,6 +81,60 @@ const GridView: React.FC<GridViewProps> = ({
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
     };
   }, [isTransitioning, onTransitionComplete]);
+
+  // Handle mouse movement for hover image
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      // Calculate mouse movement speed
+      const dx = e.clientX - lastMousePosition.current.x;
+      const dy = e.clientY - lastMousePosition.current.y;
+      const speed = Math.sqrt(dx * dx + dy * dy);
+
+      // Update last position
+      lastMousePosition.current = { x: e.clientX, y: e.clientY };
+
+      // Update mouse position
+      setMousePosition({ x: e.clientX, y: e.clientY });
+
+      // Add animation effects based on mouse movement
+      if (hoveredProject && hoverImageRef.current) {
+        // Scale effect based on speed
+        const newScale = Math.min(1 + speed * 0.01, 1.2);
+        setImageScale(newScale);
+
+        // Rotation effect based on horizontal movement
+        const newRotation = dx * 0.1;
+        setImageRotation(newRotation);
+
+        // Animate the image with GSAP
+        gsap.to(hoverImageRef.current, {
+          scale: newScale,
+          rotation: newRotation,
+          duration: 0.3,
+          ease: "power2.out",
+        });
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, [hoveredProject]);
+
+  // Reset animation when hover ends
+  useEffect(() => {
+    if (!hoveredProject && hoverImageRef.current) {
+      gsap.to(hoverImageRef.current, {
+        scale: 1,
+        rotation: 0,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+      setImageScale(1);
+      setImageRotation(0);
+    }
+  }, [hoveredProject]);
 
   const handleProjectClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
@@ -111,50 +156,72 @@ const GridView: React.FC<GridViewProps> = ({
     });
   };
 
-  const projectsByType = projects.reduce<Record<string, Projects[]>>(
-    (acc, project) => {
-      const type = project.type || "Uncategorized";
-      if (!acc[type]) {
-        acc[type] = [];
-      }
-      acc[type].push(project);
-      return acc;
-    },
-    {}
-  );
+  const handleProjectHover = (project: Projects | null) => {
+    setHoveredProject(project);
+  };
 
   return (
     <div ref={gridRef} className={styles.gridElement}>
-      {Object.entries(projectsByType).map(
-        ([type, typeProjects], sectionIndex) => (
-          <div key={type} className={`${styles.gridSection} gridSection`}>
-            <h2 className={`${styles.gridSectionTitle} gridSectionTitle`}>
-              {TYPES_MAP[type as keyof typeof TYPES_MAP]}
-            </h2>
-            <div className={styles.gridProjects}>
-              {typeProjects.map((project) => (
-                <Link
-                  href={`/projects/${project.slug?.current}`}
-                  key={project.title}
-                  className={`${styles.gridProject} gridProject`}
-                  onClick={(e) =>
-                    handleProjectClick(e, `/projects/${project.slug?.current}`)
-                  }
-                >
-                  <div className={styles.imageWrapper}>
-                    <Image
-                      src={project?.image?.asset?.url || ""}
-                      alt={project?.title || ""}
-                      layout="fill"
-                      objectFit="cover"
-                    />
-                  </div>
-                  <p className={styles.gridProjectTitle}>{project.title}</p>
-                </Link>
-              ))}
+      <div className={styles.gridProjects}>
+        {projects.map((project) => (
+          <Link
+            href={`/projects/${project.slug?.current}`}
+            key={project.title}
+            className={`${styles.gridProject} gridProject`}
+            onClick={(e) =>
+              handleProjectClick(e, `/projects/${project.slug?.current}`)
+            }
+            onMouseEnter={() => handleProjectHover(project)}
+            onMouseLeave={() => handleProjectHover(null)}
+          >
+            <div className={styles.projectInfo}>
+              <h3 className={styles.gridProjectTitle}>{project.title}</h3>
+              <div className={styles.projectMeta}>
+                {project.year && <span>{project.year}</span>}
+                {project.client && <span>{project.client}</span>}
+                <span>{TYPES_MAP[project.type as keyof typeof TYPES_MAP]}</span>
+              </div>
             </div>
-          </div>
-        )
+            <div className={styles.imageWrapper}>
+              <Image
+                src={project?.image?.asset?.url || ""}
+                alt={project?.title || ""}
+                layout="fill"
+                objectFit="cover"
+              />
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Hover image that follows the mouse */}
+      {hoveredProject && (
+        <div
+          ref={hoverImageRef}
+          className={styles.hoverImage}
+          style={{
+            position: "fixed",
+            left: `${mousePosition.x + 10}px`,
+            top: `${mousePosition.y + 10}px`,
+            transform: `scale(${imageScale}) rotate(${imageRotation}deg)`,
+            zIndex: 1000,
+            width: "300px",
+            height: "200px",
+            pointerEvents: "none",
+            opacity: 1,
+            borderRadius: "4px",
+            overflow: "hidden",
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+            transition: "transform 0.3s ease-out",
+          }}
+        >
+          <Image
+            src={hoveredProject?.image?.asset?.url || ""}
+            alt={hoveredProject?.title || ""}
+            layout="fill"
+            objectFit="cover"
+          />
+        </div>
       )}
     </div>
   );

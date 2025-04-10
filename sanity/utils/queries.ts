@@ -32,6 +32,7 @@ export const getLayout = gql`
               width
               height
             }
+            lqip
           }
         }
       }
@@ -48,6 +49,8 @@ export const getProjects = gql`
         current
       }
       descriptionRaw
+      year
+      client
       image {
         asset {
           url
@@ -56,6 +59,7 @@ export const getProjects = gql`
               width
               height
             }
+            lqip
           }
         }
       }
@@ -80,6 +84,8 @@ export const getSingleProject = gql`
         current
       }
       descriptionRaw
+      year
+      client
       gallery {
         ... on Image {
           asset {
@@ -90,6 +96,7 @@ export const getSingleProject = gql`
                 width
                 height
               }
+              lqip
             }
           }
         }
@@ -109,6 +116,7 @@ export const getSingleProject = gql`
               width
               height
             }
+            lqip
           }
         }
       }

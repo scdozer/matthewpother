@@ -11,6 +11,7 @@ export const project = defineType({
       type: "string",
       validation: (Rule) => Rule.required().error("Field is required."),
     }),
+
     defineField({
       name: "slug",
       title: "Slug",
@@ -45,6 +46,16 @@ export const project = defineType({
         ],
       },
       validation: (Rule) => Rule.required().error("Field is required."),
+    }),
+    defineField({
+      name: "year",
+      title: "Year",
+      type: "number",
+    }),
+    defineField({
+      name: "client",
+      title: "Client",
+      type: "string",
     }),
     defineField({
       name: "description",

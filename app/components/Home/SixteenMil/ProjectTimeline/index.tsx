@@ -40,51 +40,69 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
 
   useEffect(() => {
     if (redLineRef.current && timelineRef.current && projectInfoRef.current) {
-      const duration = 5;
+      const duration = 4;
 
       const initialTl = gsap.timeline();
 
       initialTl.to(projectItemsRef.current, {
         opacity: 1,
         y: 0,
-        stagger: 0.2,
-        duration: 0.5,
+        stagger: 0.1,
+        duration: 0.1,
         ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
       });
 
       initialTl.to(
         redLineRef.current,
         {
-          height: "100%",
+          height: "2px",
           duration: 0.5,
           ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
         },
         "-=0.3"
       );
 
-      //   initialTl.to(projectInfoRef.current, {
-      //     opacity: 1,
-      //     y: 0,
-      //     duration: 0.5,
-      //     ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
-      //     delay: 5,
-      //   });
+      initialTl.to(projectInfoRef.current, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+        delay: 5,
+      });
 
-      tlRef.current = gsap
-        .timeline({ repeat: -1, delay: 2.5 })
-        .to(redLineRef.current, {
-          left: "100%",
-          duration: duration * projects.length,
-          ease: "linear",
-          onUpdate: () => {
-            const progress = tlRef.current?.progress() || 0;
-            const newIndex = Math.floor(progress * projects.length);
-            setAnimatingIndex(newIndex);
-          },
-          onComplete: () => {
-            setAnimatingIndex(0);
-          },
-        });
+      // Create the main timeline
+      tlRef.current = gsap.timeline({ repeat: -1, delay: 0 });
+
+      // Add animations for each project
+      projects.forEach((_, index) => {
+        const projectWidth = 100 / projects.length;
+        const startPosition = index * projectWidth;
+
+        tlRef.current
+          ?.to(redLineRef.current, {
+            left: `${startPosition}%`,
+            width: `${projectWidth}%`,
+            duration: duration / 2, // Half the duration for growing
+            ease: "power2.inOut",
+          })
+          .to(redLineRef.current, {
+            width: "0%",
+            left: `${startPosition + projectWidth}%`,
+            duration: duration / 2, // Half the duration for shrinking
+            ease: "power2.inOut",
+            onUpdate: () => {
+              const progress = tlRef.current?.progress() || 0;
+              const newIndex = Math.floor(progress * projects.length);
+              setAnimatingIndex(newIndex);
+            },
+            onComplete:
+              index === projects.length - 1
+                ? () => {
+                    setAnimatingIndex(0);
+                  }
+                : undefined,
+          });
+      });
     }
 
     return () => {
@@ -100,10 +118,10 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
         {
           opacity: 1,
           y: 0,
-          duration: 0.5,
+          duration: 0.25,
           ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
           delay: 0.2,
-          stagger: 0.2,
+          stagger: 0.1,
         }
       );
     }

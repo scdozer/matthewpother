@@ -316,6 +316,7 @@ export type Projects = Document & {
   _type?: Maybe<Scalars['String']['output']>;
   /** Date the document was last modified */
   _updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  client?: Maybe<Scalars['String']['output']>;
   descriptionRaw?: Maybe<Scalars['JSON']['output']>;
   featured?: Maybe<Scalars['Boolean']['output']>;
   gallery?: Maybe<Array<Maybe<FileOrImage>>>;
@@ -327,6 +328,7 @@ export type Projects = Document & {
   video?: Maybe<File>;
   /** Vimeo or YouTube URL */
   videoEmbed?: Maybe<Scalars['String']['output']>;
+  year?: Maybe<Scalars['Float']['output']>;
 };
 
 export type ProjectsFilter = {
@@ -338,6 +340,7 @@ export type ProjectsFilter = {
   _rev?: InputMaybe<StringFilter>;
   _type?: InputMaybe<StringFilter>;
   _updatedAt?: InputMaybe<DatetimeFilter>;
+  client?: InputMaybe<StringFilter>;
   featured?: InputMaybe<BooleanFilter>;
   image?: InputMaybe<ImageFilter>;
   mainVideo?: InputMaybe<FileFilter>;
@@ -346,6 +349,7 @@ export type ProjectsFilter = {
   type?: InputMaybe<StringFilter>;
   video?: InputMaybe<FileFilter>;
   videoEmbed?: InputMaybe<StringFilter>;
+  year?: InputMaybe<FloatFilter>;
 };
 
 export type ProjectsSorting = {
@@ -355,6 +359,7 @@ export type ProjectsSorting = {
   _rev?: InputMaybe<SortOrder>;
   _type?: InputMaybe<SortOrder>;
   _updatedAt?: InputMaybe<SortOrder>;
+  client?: InputMaybe<SortOrder>;
   featured?: InputMaybe<SortOrder>;
   image?: InputMaybe<ImageSorting>;
   mainVideo?: InputMaybe<FileSorting>;
@@ -363,6 +368,7 @@ export type ProjectsSorting = {
   type?: InputMaybe<SortOrder>;
   video?: InputMaybe<FileSorting>;
   videoEmbed?: InputMaybe<SortOrder>;
+  year?: InputMaybe<SortOrder>;
 };
 
 export type RootQuery = {

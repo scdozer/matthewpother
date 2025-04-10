@@ -202,7 +202,7 @@ const LayeredCard: React.FC<LayeredCardProps> = ({
           "50%": { value: 0 },
           "100%": { value: 1 },
         },
-        duration: 5,
+        duration: 2,
         repeat: -1,
         delay: i * (duration / (planeCount * 2)),
         onUpdate: () => {

@@ -38,9 +38,6 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
       duration: 2,
       delay: 1,
       ease: "power2.out",
-      //   onUpdate: () => {
-      //     setScale(groupRef.current!.scale.x);
-      //   },
     });
   }, [viewport]);
 
@@ -124,7 +121,7 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
               <Suspense fallback={null}>
                 <ResponsiveGroup>
                   <LayeredCard
-                    projects={featuredProjects}
+                    projects={projects}
                     currentIndex={currentIndex}
                   />
                 </ResponsiveGroup>
@@ -134,7 +131,7 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
           </div>
           <div className="project-timeline">
             <ProjectTimeline
-              projects={featuredProjects}
+              projects={projects}
               currentIndex={currentIndex}
               onProjectChange={handleProjectChange}
               onProjectNavigation={handleProjectNavigation}
@@ -151,7 +148,7 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
       )}
       {!isNavigating && (
         <button className={styles.viewToggle} onClick={handleViewChange}>
-          {currentView === "3d" ? "All Projects" : "View Selects"}
+          {currentView === "3d" ? "list view" : "timeline view"}
         </button>
       )}
     </div>
