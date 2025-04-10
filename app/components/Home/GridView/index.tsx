@@ -29,6 +29,7 @@ const GridView: React.FC<GridViewProps> = ({
   onTransitionComplete,
 }) => {
   const gridRef = useRef<HTMLDivElement>(null);
+  const gridProjectsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const [isNavigating, setIsNavigating] = useState(false);
   const [hoveredProject, setHoveredProject] = useState<Projects | null>(null);
@@ -49,36 +50,79 @@ const GridView: React.FC<GridViewProps> = ({
       return;
     }
 
-    // Animate in
-    const projects = gsap.utils.toArray<HTMLElement>(".gridProject");
+    // Set up ScrollTrigger defaults to use the grid container as the scroller
+    ScrollTrigger.defaults({ scroller: gridRef.current });
 
-    gsap.set(projects, { opacity: 0, y: 20 });
+    // Get all project elements
+    const projectElements = gsap.utils.toArray<HTMLElement>(".gridProject");
 
-    ScrollTrigger.batch(projects, {
-      start: "top 80%",
-      onEnter: (batch) => {
-        gsap.to(batch, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
-      },
-      onLeave: (batch) => {
-        gsap.to(batch, { opacity: 0, y: 20, duration: 0.5 });
-      },
-      onEnterBack: (batch) => {
-        gsap.to(batch, { opacity: 1, y: 0, duration: 0.5, stagger: 0.1 });
-      },
-      onLeaveBack: (batch) => {
-        gsap.to(batch, { opacity: 0, y: 20, duration: 0.5 });
-      },
+    // Set initial state for all projects
+    gsap.set(projectElements, { opacity: 0, y: 20 });
+
+    // Create a timeline for the initial stagger animation
+    const initialTimeline = gsap.timeline();
+
+    // Find elements that are initially in viewport
+    const initialElements = projectElements.filter((el) =>
+      ScrollTrigger.isInViewport(el, 0.1)
+    );
+
+    // Animate initial elements with stagger
+    if (initialElements.length > 0) {
+      initialTimeline.to(initialElements, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        stagger: 0.1,
+        ease: "power2.out",
+      });
+    }
+
+    // Set up scroll triggers for all projects
+    projectElements.forEach((project, index) => {
+      ScrollTrigger.create({
+        trigger: project,
+        start: "top 90%", // Start animation earlier
+        end: "top 10%", // End animation later
+        toggleActions: "play none none reverse", // Play on enter, reverse on leave
+        onEnter: () => {
+          gsap.to(project, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        },
+        onLeave: () => {
+          gsap.to(project, {
+            opacity: 0,
+            y: 20,
+            duration: 0.5,
+          });
+        },
+        onEnterBack: () => {
+          gsap.to(project, {
+            opacity: 1,
+            y: 0,
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        },
+        onLeaveBack: () => {
+          gsap.to(project, {
+            opacity: 0,
+            y: 20,
+            duration: 0.5,
+          });
+        },
+      });
     });
 
-    // Animate elements that are initially in view
-    gsap.utils.toArray<HTMLElement>(".gridProject").forEach((project) => {
-      if (ScrollTrigger.isInViewport(project)) {
-        gsap.to(project, { opacity: 1, y: 0, duration: 0.5 });
-      }
-    });
+    ScrollTrigger.refresh();
 
     return () => {
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      ScrollTrigger.defaults({ scroller: window });
     };
   }, [isTransitioning, onTransitionComplete]);
 
@@ -162,7 +206,7 @@ const GridView: React.FC<GridViewProps> = ({
 
   return (
     <div ref={gridRef} className={styles.gridElement}>
-      <div className={styles.gridProjects}>
+      <div ref={gridProjectsRef} className={styles.gridProjects}>
         {projects.map((project) => (
           <Link
             href={`/projects/${project.slug?.current}`}
