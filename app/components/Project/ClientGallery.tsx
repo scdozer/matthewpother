@@ -121,6 +121,7 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
                 placeholder="blur"
                 blurDataURL={item?.asset?.metadata?.lqip || ""}
                 quality={90}
+                style={{ objectFit: "cover" }}
               />
             )}
             {isFileAsset(item) && (

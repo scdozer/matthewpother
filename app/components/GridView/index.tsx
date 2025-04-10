@@ -248,10 +248,11 @@ const GridView: React.FC<GridViewProps> = ({
               <Image
                 src={project?.image?.asset?.url || ""}
                 alt={project?.title || ""}
-                layout="fill"
+                fill={true}
                 placeholder="blur"
                 blurDataURL={project?.image?.asset?.metadata?.lqip || ""}
                 quality={90}
+                style={{ objectFit: "cover" }}
               />
             </div>
           </Link>
@@ -282,10 +283,11 @@ const GridView: React.FC<GridViewProps> = ({
           <Image
             src={hoveredProject?.image?.asset?.url || ""}
             alt={hoveredProject?.title || ""}
-            layout="fill"
+            fill={true}
             placeholder="blur"
             blurDataURL={hoveredProject?.image?.asset?.metadata?.lqip || ""}
             quality={90}
+            style={{ objectFit: "cover" }}
           />
         </div>
       )}

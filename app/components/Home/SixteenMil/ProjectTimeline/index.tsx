@@ -164,10 +164,11 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
               <Image
                 src={project?.image?.asset?.url || ""}
                 alt={project?.title || ""}
-                layout="fill"
+                fill={true}
                 placeholder="blur"
                 blurDataURL={project?.image?.asset?.metadata?.lqip || ""}
                 quality={90}
+                style={{ objectFit: "cover" }}
               />
             </div>
           ))}
