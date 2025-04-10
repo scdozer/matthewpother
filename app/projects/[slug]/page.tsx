@@ -1,4 +1,5 @@
 import { Metadata, ResolvingMetadata } from "next";
+
 import {
   fetchProjects,
   fetchSingleProject,
@@ -32,10 +33,11 @@ export default async function ProjectPage({
   params: { slug: string };
 }) {
   const project = await fetchSingleProject(params.slug);
+  const projects = await fetchProjects();
 
   if (!project) {
     return <div>Project not found</div>;
   }
 
-  return <Project project={project} />;
+  return <Project project={project} projects={projects} />;
 }

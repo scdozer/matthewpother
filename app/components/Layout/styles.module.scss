@@ -5,7 +5,7 @@
   left: 0;
   width: 100%;
 
-  z-index: 2;
+  z-index: 1;
 }
 
 .content {
@@ -16,6 +16,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   padding: 1rem;
+  z-index: 102;
 
   @media (max-width: 768px) {
     display: flex;

@@ -11,7 +11,7 @@ import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Projects } from "@/sanity/utils/graphql";
 import * as THREE from "three";
 import ProjectTimeline from "./ProjectTimeline";
-import GridView from "../GridView";
+import GridView from "@/app/components/GridView";
 import { gsap } from "gsap";
 import styles from "./styles.module.scss";
 import { useRouter } from "next/navigation";
@@ -67,10 +67,6 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
   const [currentView, setCurrentView] = useState<"3d" | "grid">("3d");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
-  const featuredProjects = useMemo(
-    () => projects.filter((project) => project.featured),
-    [projects]
-  );
 
   const handleProjectChange = useCallback((index: number) => {
     setCurrentIndex(index);
