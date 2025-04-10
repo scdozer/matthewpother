@@ -27,56 +27,69 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
         /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
         window.innerWidth <= 768;
 
-      // Refresh ScrollTrigger on resize
-      ScrollTrigger.addEventListener("refresh", () => {
+      // Handle window resize
+      const handleResize = () => {
         ScrollTrigger.refresh();
-      });
+      };
 
-      // Refresh on orientation change
+      window.addEventListener("resize", handleResize);
+
+      // Handle orientation change
       window.addEventListener("orientationchange", () => {
         setTimeout(() => {
           ScrollTrigger.refresh();
         }, 200);
       });
 
+      // Create a timeline for all animations
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          trigger: galleryRef.current,
+          start: "top 60%",
+          end: "bottom bottom",
+          scrub: isMobile ? 0.5 : 1,
+          // markers: true, // Uncomment for debugging
+        },
+      });
+
+      // Add each item to the timeline with staggered timing
       items.forEach((item: any, index: number) => {
         const isEven = index % 2 === 0;
         const startPosition = isEven ? "20%" : "-20%";
 
-        gsap.fromTo(
+        // Set initial state
+        gsap.set(item, {
+          y: startPosition,
+          opacity: 0,
+          scale: 0.8,
+        });
+
+        // Add to timeline with staggered timing
+        tl.to(
           item,
-          {
-            y: startPosition,
-            opacity: 0,
-            scale: 0.8,
-          },
           {
             y: "0%",
             opacity: 1,
             scale: 1,
-            duration: 1,
+            duration: 0.5,
             ease: "power2.out",
-            scrollTrigger: {
-              trigger: item,
-              // Adjust start and end positions for mobile
-              start: isMobile ? "top bottom-=20%" : "top bottom-=100",
-              end: isMobile ? "top center+=20%" : "top 70%",
-              scrub: isMobile ? 0.5 : 1,
-              // Add markers for debugging (remove in production)
-              // markers: true,
-              // Add toggleActions for better control
-              toggleActions: "play none none reverse",
-              // Add fastScrollEnd for better performance
-              fastScrollEnd: true,
-            },
-          }
-        );
+          },
+          index * 0.1
+        ); // Stagger the animations
       });
-    }
 
-    return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-    };
+      // Force a refresh after a short delay to ensure everything is set up correctly
+      setTimeout(() => {
+        ScrollTrigger.refresh();
+      }, 500);
+
+      // Clean up event listeners
+      return () => {
+        window.removeEventListener("resize", handleResize);
+        window.removeEventListener("orientationchange", handleResize);
+        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+      };
+    }
   }, [gallery, videoEmbed]);
 
   const isImageAsset = (item: any): item is { asset: SanityImageAsset } => {
