@@ -26,12 +26,18 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
   const [scale, setScale] = useState(0);
   const groupRef = useRef<THREE.Group>(null);
   const finalScaleRef = useRef(1.5);
+  const initialRotationRef = useRef({ value: 0 });
+  const initialAnimationCompleteRef = useRef(false);
 
   useEffect(() => {
     const newScale = Math.min(viewport.width / 2.25, viewport.height / 2);
     finalScaleRef.current = newScale;
 
-    gsap.to(groupRef.current!.scale, {
+    // Create a timeline for the combined scaling and rotation animation
+    const tl = gsap.timeline();
+
+    // Add the scaling animation
+    tl.to(groupRef.current!.scale, {
       x: newScale,
       y: newScale,
       z: newScale,
@@ -39,6 +45,26 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
       delay: 1,
       ease: "power2.out",
     });
+
+    // Add the 360-degree rotation animation
+    tl.to(
+      initialRotationRef.current,
+      {
+        value: Math.PI * 2, // 360 degrees in radians
+        duration: 2,
+        delay: 1,
+        ease: "power2.inOut",
+        onUpdate: () => {
+          if (groupRef.current) {
+            groupRef.current.rotation.y = initialRotationRef.current.value;
+          }
+        },
+        onComplete: () => {
+          initialAnimationCompleteRef.current = true;
+        },
+      },
+      "<"
+    ); // Start at the same time as the scaling animation
   }, [viewport]);
 
   useFrame((state) => {
@@ -47,10 +73,13 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
       const randomOffsetX = Math.sin(time * 0.1) * 0.25;
       const randomOffsetY = Math.cos(time * 0.1) * 0.25;
 
-      groupRef.current.rotation.y =
-        Math.sin(time * 0.3 + randomOffsetY) * 0.25 + randomOffsetY;
-      groupRef.current.rotation.x =
-        Math.cos(time * 0.3 + randomOffsetX) * 0.25 + randomOffsetX;
+      // Apply the floating animation after the initial rotation is complete
+      if (initialAnimationCompleteRef.current) {
+        groupRef.current.rotation.y =
+          Math.sin(time * 0.3 + randomOffsetY) * 0.25 + randomOffsetY;
+        groupRef.current.rotation.x =
+          Math.cos(time * 0.3 + randomOffsetX) * 0.25 + randomOffsetX;
+      }
     }
   });
 
