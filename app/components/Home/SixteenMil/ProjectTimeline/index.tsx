@@ -49,6 +49,7 @@ const ProjectTimeline: React.FC<ProjectTimelineProps> = ({
         y: 0,
         stagger: 0.01,
         duration: 0.5,
+        delay: 2,
         ease: "cubic-bezier(0.25, 0.1, 0.25, 1)",
       });
 
