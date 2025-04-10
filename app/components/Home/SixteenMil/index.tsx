@@ -165,7 +165,7 @@ const ResponsiveGroup = forwardRef<
   );
 
   return (
-    <group ref={groupRef} scale={[scale, scale, scale]} position={[0, 0.4, 0]}>
+    <group ref={groupRef} scale={[scale, scale, scale]} position={[0, 0.5, 0]}>
       {children}
     </group>
   );
