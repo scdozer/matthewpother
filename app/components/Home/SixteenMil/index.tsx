@@ -6,6 +6,8 @@ import {
   useState,
   useRef,
   useCallback,
+  forwardRef,
+  useImperativeHandle,
 } from "react";
 import { OrbitControls, PerspectiveCamera } from "@react-three/drei";
 import { Projects } from "@/sanity/utils/graphql";
@@ -21,7 +23,18 @@ interface SixteenMilProps {
   projects: Projects[];
 }
 
-function ResponsiveGroup({ children }: { children: React.ReactNode }) {
+// Define the interface for the ref
+interface ResponsiveGroupRef {
+  handleInteractionStart: () => void;
+  handleInteractionEnd: () => void;
+}
+
+// Create the ResponsiveGroup component with forwardRef
+const ResponsiveGroup = forwardRef<
+  ResponsiveGroupRef,
+  { children: React.ReactNode }
+>((props, ref) => {
+  const { children } = props;
   const { viewport } = useThree();
   const [scale, setScale] = useState(0);
   const groupRef = useRef<THREE.Group>(null);
@@ -29,6 +42,8 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
   const animationStartTimeRef = useRef(0);
   const initialAnimationDurationRef = useRef(3); // 2s duration + 1s delay
   const transitionDurationRef = useRef(1); // Duration of the transition between initial rotation and floating
+  const isInteractingRef = useRef(false);
+  const interactionScaleRef = useRef(2); // Scale factor during interaction
 
   useEffect(() => {
     const newScale = Math.min(viewport.width / 2.25, viewport.height / 2);
@@ -50,6 +65,34 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
     // Record the time when the animation starts
     animationStartTimeRef.current = performance.now();
   }, [viewport]);
+
+  // Function to handle interaction start
+  const handleInteractionStart = useCallback(() => {
+    isInteractingRef.current = true;
+    if (groupRef.current) {
+      gsap.to(groupRef.current.scale, {
+        x: finalScaleRef.current * interactionScaleRef.current,
+        y: finalScaleRef.current * interactionScaleRef.current,
+        z: finalScaleRef.current * interactionScaleRef.current,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+  }, []);
+
+  // Function to handle interaction end
+  const handleInteractionEnd = useCallback(() => {
+    isInteractingRef.current = false;
+    if (groupRef.current) {
+      gsap.to(groupRef.current.scale, {
+        x: finalScaleRef.current,
+        y: finalScaleRef.current,
+        z: finalScaleRef.current,
+        duration: 0.5,
+        ease: "elastic.out(1, 0.5)",
+      });
+    }
+  }, []);
 
   useFrame((state) => {
     if (groupRef.current) {
@@ -111,12 +154,25 @@ function ResponsiveGroup({ children }: { children: React.ReactNode }) {
     }
   });
 
+  // Expose the interaction handlers to the parent component
+  useImperativeHandle(
+    ref,
+    () => ({
+      handleInteractionStart,
+      handleInteractionEnd,
+    }),
+    [handleInteractionStart, handleInteractionEnd]
+  );
+
   return (
     <group ref={groupRef} scale={[scale, scale, scale]} position={[0, 0.4, 0]}>
       {children}
     </group>
   );
-}
+});
+
+// Set display name for debugging
+ResponsiveGroup.displayName = "ResponsiveGroup";
 
 export default function SixteenMil({ projects }: SixteenMilProps) {
   const router = useRouter();
@@ -124,6 +180,8 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
   const [currentView, setCurrentView] = useState<"3d" | "grid">("3d");
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const orbitControlsRef = useRef<any>(null);
+  const responsiveGroupRef = useRef<ResponsiveGroupRef>(null);
 
   const handleProjectChange = useCallback((index: number) => {
     setCurrentIndex(index);
@@ -152,6 +210,19 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
     });
   };
 
+  // Handle OrbitControls interaction
+  const handleOrbitControlsStart = useCallback(() => {
+    if (responsiveGroupRef.current?.handleInteractionStart) {
+      responsiveGroupRef.current.handleInteractionStart();
+    }
+  }, []);
+
+  const handleOrbitControlsEnd = useCallback(() => {
+    if (responsiveGroupRef.current?.handleInteractionEnd) {
+      responsiveGroupRef.current.handleInteractionEnd();
+    }
+  }, []);
+
   useEffect(() => {
     if (isTransitioning && !isNavigating) {
       if (currentView === "3d") {
@@ -172,13 +243,18 @@ export default function SixteenMil({ projects }: SixteenMilProps) {
             <Canvas>
               <PerspectiveCamera makeDefault position={[0, 0, 5]} />
               <Suspense fallback={null}>
-                <ResponsiveGroup>
+                <ResponsiveGroup ref={responsiveGroupRef}>
                   <LayeredCard
                     projects={projects}
                     currentIndex={currentIndex}
                   />
                 </ResponsiveGroup>
-                <OrbitControls enableZoom={false} />
+                <OrbitControls
+                  ref={orbitControlsRef}
+                  enableZoom={false}
+                  onStart={handleOrbitControlsStart}
+                  onEnd={handleOrbitControlsEnd}
+                />
               </Suspense>
             </Canvas>
           </div>
