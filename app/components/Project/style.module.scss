@@ -83,12 +83,20 @@
   font-size: 2.5rem;
   margin-bottom: 20px;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    font-size: 1.5rem;
+  }
 }
 
 .description {
   font-size: 1.1rem;
   line-height: 1.6;
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    font-size: 0.8rem;
+  }
 }
 
 .viewToggle {
