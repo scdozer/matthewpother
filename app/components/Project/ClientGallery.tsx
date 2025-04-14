@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import ScrollTrigger from "gsap/ScrollTrigger";
@@ -15,6 +15,14 @@ interface ProjectGalleryProps {
 
 const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
   const galleryRef = useRef<HTMLDivElement>(null);
+  const [isIOS, setIsIOS] = useState(false);
+
+  useEffect(() => {
+    // Detect iOS
+    const isIOSDevice =
+      /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(isIOSDevice);
+  }, []);
 
   useEffect(() => {
     if (galleryRef.current) {
@@ -41,56 +49,107 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
         }, 200);
       });
 
-      // Create a timeline for all animations
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: galleryRef.current,
-          start: "top 60%",
-          end: "bottom bottom",
-          scrub: isMobile ? 0.5 : 1,
-          // markers: true, // Uncomment for debugging
-        },
-      });
+      if (isIOS) {
+        // iOS-specific approach using IntersectionObserver
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const item = entry.target as HTMLElement;
+                const index = items.indexOf(item);
+                const isEven = index % 2 === 0;
+                const startPosition = isEven ? "20%" : "-20%";
 
-      // Add each item to the timeline with staggered timing
-      items.forEach((item: any, index: number) => {
-        const isEven = index % 2 === 0;
-        const startPosition = isEven ? "20%" : "-20%";
+                gsap.fromTo(
+                  item,
+                  {
+                    y: startPosition,
+                    opacity: 0,
+                    scale: 0.8,
+                  },
+                  {
+                    y: "0%",
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.8,
+                    ease: "power2.out",
+                  }
+                );
 
-        // Set initial state
-        gsap.set(item, {
-          y: startPosition,
-          opacity: 0,
-          scale: 0.8,
+                // Once animated, unobserve
+                observer.unobserve(item);
+              }
+            });
+          },
+          {
+            root: null,
+            rootMargin: "0px",
+            threshold: 0.1,
+          }
+        );
+
+        // Observe all items
+        items.forEach((item) => {
+          observer.observe(item as HTMLElement);
         });
 
-        // Add to timeline with staggered timing
-        tl.to(
-          item,
-          {
-            y: "0%",
-            opacity: 1,
-            scale: 1,
-            duration: 0.5,
-            ease: "power2.out",
+        return () => {
+          observer.disconnect();
+          window.removeEventListener("resize", handleResize);
+          window.removeEventListener("orientationchange", handleResize);
+        };
+      } else {
+        // Non-iOS approach using ScrollTrigger timeline
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: galleryRef.current,
+            start: "top 60%",
+            end: "bottom bottom",
+            scrub: isMobile ? 0.5 : 1,
+            // markers: true, // Uncomment for debugging
           },
-          index * 0.1
-        ); // Stagger the animations
-      });
+        });
 
-      // Force a refresh after a short delay to ensure everything is set up correctly
-      setTimeout(() => {
-        ScrollTrigger.refresh();
-      }, 500);
+        // Add each item to the timeline with staggered timing
+        items.forEach((item: any, index: number) => {
+          const isEven = index % 2 === 0;
+          const startPosition = isEven ? "20%" : "-20%";
 
-      // Clean up event listeners
-      return () => {
-        window.removeEventListener("resize", handleResize);
-        window.removeEventListener("orientationchange", handleResize);
-        ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-      };
+          // Set initial state
+          gsap.set(item, {
+            y: startPosition,
+            opacity: 0,
+            scale: 0.8,
+          });
+
+          // Add to timeline with staggered timing
+          tl.to(
+            item,
+            {
+              y: "0%",
+              opacity: 1,
+              scale: 1,
+              duration: 0.5,
+              ease: "power2.out",
+            },
+            index * 0.1
+          ); // Stagger the animations
+        });
+
+        // Force a refresh after a short delay to ensure everything is set up correctly
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 500);
+
+        // Clean up event listeners
+        return () => {
+          window.removeEventListener("resize", handleResize);
+          window.removeEventListener("orientationchange", handleResize);
+          ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+        };
+      }
     }
-  }, [gallery, videoEmbed]);
+  }, [gallery, videoEmbed, isIOS]);
 
   const isImageAsset = (item: any): item is { asset: SanityImageAsset } => {
     return item.asset && item.asset._type === "sanity.imageAsset";
@@ -113,6 +172,7 @@ const ProjectGallery = ({ gallery, videoEmbed }: ProjectGalleryProps) => {
             muted={false}
             playsinline={true}
             controls={true}
+            style={{ position: "absolute", top: 0, left: 0 }}
             config={{
               youtube: {
                 playerVars: {

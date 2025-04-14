@@ -5,6 +5,11 @@
   grid-row-gap: 5rem;
   margin-top: 40px;
   margin-bottom: 90px;
+
+  @media (max-width: 768px) {
+    margin-top: 20px;
+    grid-row-gap: 20px;
+  }
 }
 
 .galleryItem {
@@ -23,11 +28,30 @@
     margin-top: -50px;
     grid-column: span 5;
   }
+
+  @media (max-width: 768px) {
+    &.small {
+      margin-top: 0px;
+    }
+  }
 }
 
 .videoItem {
   grid-column: span 12;
   aspect-ratio: 16 / 9;
+  width: 100%;
+  height: auto;
+  position: relative;
+  overflow: hidden;
+
+  // Ensure the ReactPlayer fills the container
+  :global(.react-player) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+  }
 }
 
 .video {
